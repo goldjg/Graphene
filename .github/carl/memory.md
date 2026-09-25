@@ -43,9 +43,10 @@ Graphene uses its own multi-tenant Microsoft Entra SPA app registration using
 Authorization Code Flow with PKCE via MSAL Browser. The `organizations`
 authority permits work/school accounts without hardcoding an Entra tenant; the
 authenticated account's tenant context identifies the tenant being investigated.
-Accounts and tokens remain session-scoped. MSAL temporary redirect metadata
-uses local storage so mobile browsers can recover PKCE/state when the
-authentication response returns in a different browsing context.
+MSAL v4 encrypted local storage holds accounts, tokens, and temporary redirect
+metadata so mobile browsers can recover authentication when the response
+returns through a different browsing context. Application code must not read,
+log, or expose those cache entries directly.
 
 Initial delegated Microsoft Graph scopes are exactly:
 

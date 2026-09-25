@@ -22,7 +22,7 @@ describe('MSAL configuration', () => {
       postLogoutRedirectUri: 'https://graphene.example.test',
       navigateToLoginRequestUrl: false,
     });
-    expect(config.cache?.cacheLocation).toBe(BrowserCacheLocation.SessionStorage);
+    expect(config.cache?.cacheLocation).toBe(BrowserCacheLocation.LocalStorage);
     expect(config.cache?.temporaryCacheLocation).toBe(BrowserCacheLocation.LocalStorage);
     expect(config.cache?.storeAuthStateInCookie).toBe(false);
   });

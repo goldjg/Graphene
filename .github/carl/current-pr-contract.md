@@ -34,8 +34,8 @@ Graphene truths unless explicitly amended in a future cARL contract and ADR.
 - npm scripts and dependency lockfile.
 - Netlify deployment and security headers.
 - Safe Vite environment configuration.
-- Redirect-state recovery for mobile browsers while keeping tokens and
-  accounts session-scoped.
+- Cross-context authentication cache recovery for mobile browsers using MSAL
+  v4 encrypted local storage.
 - Unit tests for Milestone 0 configuration invariants.
 - Milestone 0 documentation.
 
@@ -74,8 +74,9 @@ name is Graphene.
 - Least privilege.
 - Read-only Graph access.
 - No token logging or raw-token display.
-- Durable MSAL accounts and tokens remain in session storage; only short-lived
-  redirect PKCE/state metadata may use local storage.
+- MSAL v4 encrypted local storage may hold accounts, tokens, and temporary
+  redirect metadata for mobile cross-context recovery. Application code must
+  not directly read, log, or expose those cache entries.
 - No production Graph response logging.
 - Graph strings are untrusted input.
 - React escaping must remain intact.

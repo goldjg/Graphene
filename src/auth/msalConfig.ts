@@ -20,9 +20,9 @@ export function createMsalConfig(config: AppConfig): Configuration {
       navigateToLoginRequestUrl: false,
     },
     cache: {
-      cacheLocation: BrowserCacheLocation.SessionStorage,
-      // iOS may complete a redirect in a different browsing context. Keep
-      // durable tokens session-scoped, but allow PKCE/state recovery there.
+      // MSAL v4 encrypts local-storage auth artifacts with a key held in a
+      // session cookie. Cross-context storage is required for mobile Safari.
+      cacheLocation: BrowserCacheLocation.LocalStorage,
       temporaryCacheLocation: BrowserCacheLocation.LocalStorage,
       storeAuthStateInCookie: false,
     },

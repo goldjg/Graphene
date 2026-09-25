@@ -114,11 +114,11 @@ derives the investigated tenant from the authenticated account. Do not use
 
 ### Browser redirect behavior
 
-Graphene keeps accounts and tokens in session storage. MSAL's short-lived
-redirect metadata is stored in local storage so sign-in can complete when
-mobile Safari returns the authentication response in a different browsing
-context. MSAL removes this temporary PKCE and state data after processing the
-response; Graphene does not persist access tokens in local storage.
+Graphene uses MSAL v4's encrypted local-storage cache so sign-in can complete
+when mobile Safari returns the authentication response through a different
+browsing context. MSAL encrypts cached accounts and tokens using a key held in
+a session cookie, and removes temporary PKCE/state data after processing the
+response. Graphene never reads or logs cached token values directly.
 
 If sign-in returns to the application without authenticating, confirm that:
 
