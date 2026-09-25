@@ -29,7 +29,11 @@ export class GraphClient {
   private readonly fetchImpl: typeof fetch;
   private readonly tokenProvider: () => Promise<string>;
 
-  constructor({ tokenProvider, baseUrl = 'https://graph.microsoft.com/v1.0', fetchImpl }: GraphClientOptions) {
+  constructor({
+    tokenProvider,
+    baseUrl = 'https://graph.microsoft.com/v1.0',
+    fetchImpl,
+  }: GraphClientOptions) {
     this.tokenProvider = tokenProvider;
     this.baseUrl = baseUrl.replace(/\/$/, '');
     this.fetchImpl = fetchImpl ?? fetch;

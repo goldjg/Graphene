@@ -82,3 +82,27 @@ is loaded.
 - Documentation and accessibility pass
 - Dependency review
 - Production build validation
+
+Status: implemented.
+
+- Security headers: added `X-Frame-Options: DENY` and a preload-eligible
+  `Strict-Transport-Security` header alongside the existing CSP, referrer
+  policy, `X-Content-Type-Options`, and `Permissions-Policy` in
+  `netlify.toml`. CSP continues to avoid wildcard sources.
+- Security review: confirmed no `dangerouslySetInnerHTML`, `eval`, or
+  dynamic code execution; no `console.*` logging anywhere in `src/`
+  (tokens and Graph-derived data are never logged); `npm audit` reports 0
+  vulnerabilities.
+- Production build: added `build.rollupOptions.output.manualChunks` in
+  `vite.config.ts` to split Cytoscape and MSAL Browser into their own
+  cacheable chunks, resolving the single->500 kB bundle warning.
+- Accessibility: verified landmark/heading structure, `role="status"`/
+  `role="alert"` live regions, and labelled form controls across
+  `App.tsx`, `QueryPanel.tsx`, and `FilterPanel.tsx`. The Cytoscape canvas
+  is exposed as `role="img"` with a descriptive label; full keyboard
+  navigation of individual graph nodes/edges is a known limitation of the
+  canvas-based renderer and is tracked as a follow-up rather than solved
+  in this milestone.
+- Dependency review: the dependency set remains minimal (React, MSAL
+  Browser, Cytoscape, and their existing dev tooling); no new runtime
+  dependencies were added for hardening.

@@ -11,10 +11,18 @@ describe('buildUserAccessGraph', () => {
   it('models direct memberships as non-inherited and transitive-only memberships as inherited', async () => {
     const client = fakeGraphClient({
       getUser: () =>
-        Promise.resolve({ id: 'user-1', displayName: 'Ada Lovelace', userPrincipalName: 'ada@example.test' }),
+        Promise.resolve({
+          id: 'user-1',
+          displayName: 'Ada Lovelace',
+          userPrincipalName: 'ada@example.test',
+        }),
       getMemberOf: () =>
         Promise.resolve([
-          { id: 'group-direct', displayName: 'Direct Group', '@odata.type': '#microsoft.graph.group' },
+          {
+            id: 'group-direct',
+            displayName: 'Direct Group',
+            '@odata.type': '#microsoft.graph.group',
+          },
           {
             id: 'role-direct',
             displayName: 'Direct Role',
@@ -23,7 +31,11 @@ describe('buildUserAccessGraph', () => {
         ]),
       getTransitiveMemberOf: () =>
         Promise.resolve([
-          { id: 'group-direct', displayName: 'Direct Group', '@odata.type': '#microsoft.graph.group' },
+          {
+            id: 'group-direct',
+            displayName: 'Direct Group',
+            '@odata.type': '#microsoft.graph.group',
+          },
           {
             id: 'role-direct',
             displayName: 'Direct Role',

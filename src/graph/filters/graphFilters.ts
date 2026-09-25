@@ -25,7 +25,9 @@ export function defaultFilterState(): GraphFilterState {
 }
 
 export function isFilterActive(filters: GraphFilterState): boolean {
-  return filters.hiddenNodeTypes.size > 0 || filters.hiddenEdgeTypes.size > 0 || filters.hideInherited;
+  return (
+    filters.hiddenNodeTypes.size > 0 || filters.hiddenEdgeTypes.size > 0 || filters.hideInherited
+  );
 }
 
 /**

@@ -68,7 +68,9 @@ describe('GraphExplorer', () => {
 
     fireEvent.click(screen.getByRole('checkbox', { name: 'Directory roles' }));
 
-    expect(screen.getByText(/Filters active: .* nodes hidden, .* edges hidden\./)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Filters active: .* nodes hidden, .* edges hidden\./),
+    ).toBeInTheDocument();
     const afterStats = screen.getByText(/nodes, .* edges/).textContent;
     expect(afterStats).not.toEqual(beforeStats);
 

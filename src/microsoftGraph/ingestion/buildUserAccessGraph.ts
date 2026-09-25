@@ -102,9 +102,7 @@ function toMembershipEdge(
   direct: boolean,
 ): GraphEdge | null {
   const provenance: RelationshipProvenance = {
-    graphEndpoint: direct
-      ? `/users/${userId}/memberOf`
-      : `/users/${userId}/transitiveMemberOf`,
+    graphEndpoint: direct ? `/users/${userId}/memberOf` : `/users/${userId}/transitiveMemberOf`,
     sourceObjectId: userId,
     direct,
     relatedObjectIds: [directoryObject.id],
