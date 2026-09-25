@@ -40,6 +40,7 @@
     "src/features/investigation": "",
     "src/graph": "",
     "src/graph/cytoscape": "",
+    "src/graph/filters": "",
     "src/graph/model": "",
     "src/graph/transforms": "",
     "src/microsoftGraph": "",
@@ -352,6 +353,15 @@
         "trust_boundary": "repository",
         "policy_attachment_point": true,
         "agent_context": "Repository component at src/graph/cytoscape."
+      },
+      {
+        "id": "component:src/graph/filters",
+        "kind": "component",
+        "path": "src/graph/filters",
+        "criticality": "medium",
+        "trust_boundary": "repository",
+        "policy_attachment_point": true,
+        "agent_context": "Repository component at src/graph/filters."
       },
       {
         "id": "component:src/graph/model",
@@ -1269,6 +1279,14 @@
         "type": "contains",
         "evidence": [
           "src/graph/cytoscape"
+        ]
+      },
+      {
+        "from": "component:src/graph",
+        "to": "component:src/graph/filters",
+        "type": "contains",
+        "evidence": [
+          "src/graph/filters"
         ]
       },
       {

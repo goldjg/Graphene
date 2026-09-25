@@ -274,3 +274,39 @@ dd {
   background: #0f172a;
   color: #ffffff;
 }
+
+.filter-panel {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid rgb(143 183 255 / 25%);
+  border-radius: 0.75rem;
+  background: rgb(15 23 42 / 72%);
+}
+
+.filter-panel fieldset {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  padding: 0.75rem;
+  border: 1px solid rgb(143 183 255 / 25%);
+  border-radius: 0.5rem;
+}
+
+.filter-panel legend {
+  padding: 0 0.35rem;
+  color: #8fb7ff;
+  font-weight: 700;
+}
+
+.filter-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #bfd0e7;
+}
+
+.filter-status {
+  margin: 0;
+  color: #8fb7ff;
+}

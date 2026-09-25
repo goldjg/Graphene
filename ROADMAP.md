@@ -68,6 +68,12 @@ loading/error/unauthenticated states.
 - Reset filters
 - Non-destructive filtering over existing graph data
 
+Status: implemented. Filtering is a pure, display-time transform
+(`applyGraphFilters`) over whatever `InvestigationGraph` is already loaded
+(demo or a live query result); it never re-queries Microsoft Graph and never
+mutates the source graph. Filters reset automatically whenever a new graph
+is loaded.
+
 ## Milestone 6 — hardening
 
 - CSP/security-header review

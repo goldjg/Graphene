@@ -59,4 +59,21 @@ describe('GraphExplorer', () => {
 
     expect(screen.getByText(/nodes, .* edges/)).toBeInTheDocument();
   });
+
+  it('filters out a node type and its edges without affecting the underlying graph', () => {
+    render(<GraphExplorer />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Load demo data' }));
+    const beforeStats = screen.getByText(/nodes, .* edges/).textContent;
+
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Directory roles' }));
+
+    expect(screen.getByText(/Filters active: .* nodes hidden, .* edges hidden\./)).toBeInTheDocument();
+    const afterStats = screen.getByText(/nodes, .* edges/).textContent;
+    expect(afterStats).not.toEqual(beforeStats);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Reset filters' }));
+
+    expect(screen.getByText(/nodes, .* edges/).textContent).toEqual(beforeStats);
+  });
 });

@@ -6,11 +6,13 @@ import {
   type GraphSelection,
 } from '../../graph/cytoscape/GraphCanvas.tsx';
 import type { GraphLayoutId } from '../../graph/cytoscape/layouts.ts';
+import { applyGraphFilters, defaultFilterState } from '../../graph/filters/graphFilters.ts';
 import { demoInvestigationGraph } from '../../graph/model/demoFixture.ts';
 import type { InvestigationGraph } from '../../graph/model/types.ts';
 import { toCytoscapeElements } from '../../graph/transforms/toCytoscapeElements.ts';
 import { QueryPanel } from '../investigation/QueryPanel.tsx';
 import { DetailsPanel } from './DetailsPanel.tsx';
+import { FilterPanel } from './FilterPanel.tsx';
 import { GraphToolbar } from './GraphToolbar.tsx';
 
 /**
@@ -23,22 +25,34 @@ export function GraphExplorer() {
   const [layout, setLayout] = useState<GraphLayoutId>('breadthfirst');
   const [selection, setSelection] = useState<GraphSelection | null>(null);
   const [canvasHandle, setCanvasHandle] = useState<GraphCanvasHandle | null>(null);
+  const [filters, setFilters] = useState(defaultFilterState());
 
-  const elements = useMemo(() => (graph ? toCytoscapeElements(graph) : []), [graph]);
+  const filteredGraph = useMemo(
+    () => (graph ? applyGraphFilters(graph, filters) : null),
+    [graph, filters],
+  );
+
+  const elements = useMemo(
+    () => (filteredGraph ? toCytoscapeElements(filteredGraph) : []),
+    [filteredGraph],
+  );
 
   const handleLoadDemo = () => {
     setGraph(demoInvestigationGraph);
     setSelection(null);
+    setFilters(defaultFilterState());
   };
 
   const handleQueryResult = (result: InvestigationGraph) => {
     setGraph(result);
     setSelection(null);
+    setFilters(defaultFilterState());
   };
 
   const handleQueryReset = () => {
     setGraph(null);
     setSelection(null);
+    setFilters(defaultFilterState());
   };
 
   const setCanvasRef = useCallback((handle: GraphCanvasHandle | null) => {
@@ -55,12 +69,14 @@ export function GraphExplorer() {
       <QueryPanel onResult={handleQueryResult} onReset={handleQueryReset} />
 
       <GraphToolbar
-        graph={graph}
+        graph={filteredGraph}
         layout={layout}
         onLayoutChange={setLayout}
         onLoadDemo={handleLoadDemo}
         canvasHandle={canvasHandle}
       />
+
+      {graph && <FilterPanel graph={graph} filters={filters} onChange={setFilters} />}
 
       <div className="graph-explorer-body">
         <GraphCanvas
@@ -69,7 +85,7 @@ export function GraphExplorer() {
           layout={layout}
           onSelectionChange={setSelection}
         />
-        <DetailsPanel graph={graph ?? { nodes: [], edges: [] }} selection={selection} />
+        <DetailsPanel graph={filteredGraph ?? { nodes: [], edges: [] }} selection={selection} />
       </div>
     </section>
   );
