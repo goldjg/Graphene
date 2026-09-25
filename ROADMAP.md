@@ -20,6 +20,8 @@ constraints, and testability stay intact.
 - Login/logout
 - Robust auth and consent error handling
 
+Status: implemented.
+
 ## Milestone 2 — graph foundation
 
 - Normalized graph domain model

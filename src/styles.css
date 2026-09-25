@@ -26,6 +26,20 @@ textarea {
   font: inherit;
 }
 
+button {
+  border: 1px solid #8fb7ff;
+  border-radius: 0.7rem;
+  padding: 0.7rem 1rem;
+  color: #ffffff;
+  background: rgb(37 99 235 / 75%);
+  cursor: pointer;
+}
+
+button:focus-visible {
+  outline: 3px solid #facc15;
+  outline-offset: 3px;
+}
+
 .app-shell {
   display: grid;
   gap: 2rem;
@@ -115,4 +129,30 @@ dd {
   border: 1px solid #34d399;
   color: #d1fae5;
   background: rgb(6 78 59 / 55%);
+}
+
+.auth-actions {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.identity-card {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid rgb(143 183 255 / 25%);
+  border-radius: 0.75rem;
+  background: rgb(15 23 42 / 72%);
+}
+
+.identity-card h3,
+.setup-warning p {
+  margin: 0;
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }

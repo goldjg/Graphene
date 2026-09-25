@@ -10,12 +10,12 @@ privilege-escalation engine, attack-path product, or risk-scoring system.
 
 ## Current feature status
 
-Milestone 0 is implemented: cARL governance, Vite + React + TypeScript
-foundation, Netlify configuration, environment configuration, and baseline
-documentation.
+Milestones 0 and 1 are implemented: cARL governance, Vite + React + TypeScript
+foundation, Netlify configuration, environment configuration, baseline
+documentation, MSAL single-tenant authentication, and Microsoft Graph `/me`.
 
-Authentication, Microsoft Graph ingestion, Cytoscape graph rendering,
-investigation workflows, filtering, and hardening are planned milestones.
+Directory relationship ingestion, Cytoscape graph rendering, investigation
+workflows, filtering, and hardening are planned milestones.
 
 ## Architecture overview
 

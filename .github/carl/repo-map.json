@@ -32,7 +32,11 @@
     "docs/architecture": "",
     "docs/architecture/adr": "",
     "src": "",
+    "src/auth": "",
     "src/config": "",
+    "src/microsoftGraph": "",
+    "src/microsoftGraph/client": "",
+    "src/microsoftGraph/dto": "",
     "src/tests": ""
   },
   "workflows": null,
@@ -269,6 +273,15 @@
         "agent_context": "Repository component at src."
       },
       {
+        "id": "component:src/auth",
+        "kind": "component",
+        "path": "src/auth",
+        "criticality": "medium",
+        "trust_boundary": "repository",
+        "policy_attachment_point": true,
+        "agent_context": "Repository component at src/auth."
+      },
+      {
         "id": "component:src/config",
         "kind": "component",
         "path": "src/config",
@@ -276,6 +289,33 @@
         "trust_boundary": "repository",
         "policy_attachment_point": true,
         "agent_context": "Repository component at src/config."
+      },
+      {
+        "id": "component:src/microsoftGraph",
+        "kind": "component",
+        "path": "src/microsoftGraph",
+        "criticality": "medium",
+        "trust_boundary": "repository",
+        "policy_attachment_point": true,
+        "agent_context": "Repository component at src/microsoftGraph."
+      },
+      {
+        "id": "component:src/microsoftGraph/client",
+        "kind": "component",
+        "path": "src/microsoftGraph/client",
+        "criticality": "medium",
+        "trust_boundary": "repository",
+        "policy_attachment_point": true,
+        "agent_context": "Repository component at src/microsoftGraph/client."
+      },
+      {
+        "id": "component:src/microsoftGraph/dto",
+        "kind": "component",
+        "path": "src/microsoftGraph/dto",
+        "criticality": "medium",
+        "trust_boundary": "repository",
+        "policy_attachment_point": true,
+        "agent_context": "Repository component at src/microsoftGraph/dto."
       },
       {
         "id": "component:src/tests",
@@ -1063,6 +1103,14 @@
       },
       {
         "from": "component:src",
+        "to": "component:src/auth",
+        "type": "contains",
+        "evidence": [
+          "src/auth"
+        ]
+      },
+      {
+        "from": "component:src",
         "to": "component:src/config",
         "type": "contains",
         "evidence": [
@@ -1071,10 +1119,34 @@
       },
       {
         "from": "component:src",
+        "to": "component:src/microsoftGraph",
+        "type": "contains",
+        "evidence": [
+          "src/microsoftGraph"
+        ]
+      },
+      {
+        "from": "component:src",
         "to": "component:src/tests",
         "type": "contains",
         "evidence": [
           "src/tests"
+        ]
+      },
+      {
+        "from": "component:src/microsoftGraph",
+        "to": "component:src/microsoftGraph/client",
+        "type": "contains",
+        "evidence": [
+          "src/microsoftGraph/client"
+        ]
+      },
+      {
+        "from": "component:src/microsoftGraph",
+        "to": "component:src/microsoftGraph/dto",
+        "type": "contains",
+        "evidence": [
+          "src/microsoftGraph/dto"
         ]
       },
       {

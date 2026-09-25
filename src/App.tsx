@@ -1,3 +1,5 @@
+import { AuthProvider } from './auth/AuthProvider.tsx';
+import { useAuth } from './auth/useAuth.ts';
 import { getAppConfig } from './config/environment.ts';
 
 export function App() {
@@ -10,13 +12,13 @@ export function App() {
         <h1 id="graphene-title">Graphene</h1>
         <p className="lede">
           A provenance-aware static SPA for exploring how identities relate to Microsoft Entra
-          resources. Milestone 0 establishes the cARL-governed foundation, tooling, and security
-          boundaries before authentication or Graph ingestion is implemented.
+          resources. Authentication uses a single-tenant public SPA registration and the approved
+          User.Read plus Directory.Read.All delegated permission baseline.
         </p>
       </section>
 
-      <section className="status-card" aria-labelledby="foundation-status">
-        <h2 id="foundation-status">Foundation status</h2>
+      <section className="status-card" aria-labelledby="auth-status">
+        <h2 id="auth-status">Authentication status</h2>
         <dl>
           <div>
             <dt>Architecture</dt>
@@ -37,9 +39,9 @@ export function App() {
             {configResult.message}
           </p>
         ) : (
-          <p className="setup-ready" role="status">
-            Environment configuration is present. Authentication is planned for Milestone 1.
-          </p>
+          <AuthProvider config={configResult.config}>
+            <AuthStatusPanel />
+          </AuthProvider>
         )}
       </section>
     </main>
@@ -47,17 +49,83 @@ export function App() {
 }
 
 type ConfigReadResult =
-  | { ok: true; authority: string }
+  | { ok: true; authority: string; config: ReturnType<typeof getAppConfig> }
   | { ok: false; message: string };
 
 function readConfig(): ConfigReadResult {
   try {
     const config = getAppConfig();
-    return { ok: true, authority: config.auth.authority };
+    return { ok: true, authority: config.auth.authority, config };
   } catch (error) {
     return {
       ok: false,
       message: error instanceof Error ? error.message : 'Graphene configuration is invalid.',
     };
   }
+}
+
+function AuthStatusPanel() {
+  const { currentUser, error, refreshIdentity, signIn, signOut, status } = useAuth();
+
+  if (status === 'initializing') {
+    return (
+      <p className="setup-ready" role="status">
+        Initializing Microsoft Entra authentication...
+      </p>
+    );
+  }
+
+  if (status === 'unauthenticated') {
+    return (
+      <div className="auth-actions">
+        <p className="setup-ready" role="status">
+          Environment configuration is present. Sign in to call Microsoft Graph /me.
+        </p>
+        <button type="button" onClick={() => void signIn()}>
+          Sign in with Microsoft Entra
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="auth-actions">
+      {currentUser ? (
+        <div className="identity-card" aria-labelledby="identity-heading">
+          <h3 id="identity-heading">Authenticated identity</h3>
+          <dl>
+            <div>
+              <dt>Display name</dt>
+              <dd>{currentUser.displayName ?? 'Not returned by Microsoft Graph'}</dd>
+            </div>
+            <div>
+              <dt>User principal name</dt>
+              <dd>{currentUser.userPrincipalName ?? 'Not returned by Microsoft Graph'}</dd>
+            </div>
+            <div>
+              <dt>Object ID</dt>
+              <dd>{currentUser.id}</dd>
+            </div>
+          </dl>
+        </div>
+      ) : null}
+
+      {error ? (
+        <div className="setup-warning" role="alert">
+          <strong>{error.title}</strong>
+          <p>{error.message}</p>
+          {error.remediation ? <p>{error.remediation}</p> : null}
+        </div>
+      ) : null}
+
+      <div className="button-row">
+        <button type="button" onClick={() => void refreshIdentity()}>
+          Refresh identity
+        </button>
+        <button type="button" onClick={() => void signOut()}>
+          Sign out
+        </button>
+      </div>
+    </div>
+  );
 }
