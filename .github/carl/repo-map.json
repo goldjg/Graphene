@@ -34,6 +34,13 @@
     "src": "",
     "src/auth": "",
     "src/config": "",
+    "src/features": "",
+    "src/features/details": "",
+    "src/features/graphExplorer": "",
+    "src/graph": "",
+    "src/graph/cytoscape": "",
+    "src/graph/model": "",
+    "src/graph/transforms": "",
     "src/microsoftGraph": "",
     "src/microsoftGraph/client": "",
     "src/microsoftGraph/dto": "",
@@ -289,6 +296,69 @@
         "trust_boundary": "repository",
         "policy_attachment_point": true,
         "agent_context": "Repository component at src/config."
+      },
+      {
+        "id": "component:src/features",
+        "kind": "component",
+        "path": "src/features",
+        "criticality": "medium",
+        "trust_boundary": "repository",
+        "policy_attachment_point": true,
+        "agent_context": "Repository component at src/features."
+      },
+      {
+        "id": "component:src/features/details",
+        "kind": "component",
+        "path": "src/features/details",
+        "criticality": "medium",
+        "trust_boundary": "repository",
+        "policy_attachment_point": true,
+        "agent_context": "Repository component at src/features/details."
+      },
+      {
+        "id": "component:src/features/graphExplorer",
+        "kind": "component",
+        "path": "src/features/graphExplorer",
+        "criticality": "medium",
+        "trust_boundary": "repository",
+        "policy_attachment_point": true,
+        "agent_context": "Repository component at src/features/graphExplorer."
+      },
+      {
+        "id": "component:src/graph",
+        "kind": "component",
+        "path": "src/graph",
+        "criticality": "medium",
+        "trust_boundary": "repository",
+        "policy_attachment_point": true,
+        "agent_context": "Repository component at src/graph."
+      },
+      {
+        "id": "component:src/graph/cytoscape",
+        "kind": "component",
+        "path": "src/graph/cytoscape",
+        "criticality": "medium",
+        "trust_boundary": "repository",
+        "policy_attachment_point": true,
+        "agent_context": "Repository component at src/graph/cytoscape."
+      },
+      {
+        "id": "component:src/graph/model",
+        "kind": "component",
+        "path": "src/graph/model",
+        "criticality": "medium",
+        "trust_boundary": "repository",
+        "policy_attachment_point": true,
+        "agent_context": "Repository component at src/graph/model."
+      },
+      {
+        "id": "component:src/graph/transforms",
+        "kind": "component",
+        "path": "src/graph/transforms",
+        "criticality": "medium",
+        "trust_boundary": "repository",
+        "policy_attachment_point": true,
+        "agent_context": "Repository component at src/graph/transforms."
       },
       {
         "id": "component:src/microsoftGraph",
@@ -1119,6 +1189,22 @@
       },
       {
         "from": "component:src",
+        "to": "component:src/features",
+        "type": "contains",
+        "evidence": [
+          "src/features"
+        ]
+      },
+      {
+        "from": "component:src",
+        "to": "component:src/graph",
+        "type": "contains",
+        "evidence": [
+          "src/graph"
+        ]
+      },
+      {
+        "from": "component:src",
         "to": "component:src/microsoftGraph",
         "type": "contains",
         "evidence": [
@@ -1131,6 +1217,46 @@
         "type": "contains",
         "evidence": [
           "src/tests"
+        ]
+      },
+      {
+        "from": "component:src/features",
+        "to": "component:src/features/details",
+        "type": "contains",
+        "evidence": [
+          "src/features/details"
+        ]
+      },
+      {
+        "from": "component:src/features",
+        "to": "component:src/features/graphExplorer",
+        "type": "contains",
+        "evidence": [
+          "src/features/graphExplorer"
+        ]
+      },
+      {
+        "from": "component:src/graph",
+        "to": "component:src/graph/cytoscape",
+        "type": "contains",
+        "evidence": [
+          "src/graph/cytoscape"
+        ]
+      },
+      {
+        "from": "component:src/graph",
+        "to": "component:src/graph/model",
+        "type": "contains",
+        "evidence": [
+          "src/graph/model"
+        ]
+      },
+      {
+        "from": "component:src/graph",
+        "to": "component:src/graph/transforms",
+        "type": "contains",
+        "evidence": [
+          "src/graph/transforms"
         ]
       },
       {

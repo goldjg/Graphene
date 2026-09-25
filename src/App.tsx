@@ -1,6 +1,7 @@
 import { AuthProvider } from './auth/AuthProvider.tsx';
 import { useAuth } from './auth/useAuth.ts';
 import { getAppConfig } from './config/environment.ts';
+import { GraphExplorer } from './features/graphExplorer/GraphExplorer.tsx';
 
 export function App() {
   const configResult = readConfig();
@@ -44,6 +45,8 @@ export function App() {
           </AuthProvider>
         )}
       </section>
+
+      <GraphExplorer />
     </main>
   );
 }

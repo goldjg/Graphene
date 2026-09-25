@@ -30,6 +30,8 @@ Status: implemented.
 - Selection and details panels
 - Layouts, fit, reset, and export foundation
 
+Status: implemented.
+
 ## Milestone 3 — Microsoft Graph ingestion
 
 - Typed Graph abstraction

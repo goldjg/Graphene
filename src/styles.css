@@ -156,3 +156,81 @@ dd {
   flex-wrap: wrap;
   gap: 0.75rem;
 }
+
+.graph-explorer {
+  display: grid;
+  gap: 1rem;
+  max-width: 90rem;
+}
+
+.graph-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid rgb(143 183 255 / 25%);
+  border-radius: 0.75rem;
+  background: rgb(15 23 42 / 72%);
+}
+
+.layout-select {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #bfd0e7;
+}
+
+.layout-select select {
+  padding: 0.4rem 0.6rem;
+  border-radius: 0.5rem;
+  border: 1px solid #8fb7ff;
+  background: #0f172a;
+  color: #ffffff;
+}
+
+.graph-stats {
+  margin: 0 0 0 auto;
+  color: #8fb7ff;
+  font-weight: 700;
+}
+
+.graph-explorer-body {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(18rem, 1fr);
+  gap: 1rem;
+  min-height: 32rem;
+}
+
+.graph-canvas {
+  min-height: 32rem;
+  border: 1px solid rgb(143 183 255 / 25%);
+  border-radius: 0.75rem;
+  background: #0b1220;
+}
+
+.details-panel {
+  display: grid;
+  align-content: start;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid rgb(143 183 255 / 25%);
+  border-radius: 0.75rem;
+  background: rgb(15 23 42 / 72%);
+}
+
+.raw-data-disclosure pre {
+  max-height: 20rem;
+  overflow: auto;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background: #0b1220;
+  color: #9ec1ff;
+  font-size: 0.8rem;
+}
+
+@media (width <= 60rem) {
+  .graph-explorer-body {
+    grid-template-columns: 1fr;
+  }
+}
