@@ -41,6 +41,12 @@ Status: implemented.
 - Supported relationships available under the initial permission baseline
 - Provenance metadata
 
+Status: implemented. Only `/me` (or `/users/{id}`), `/memberOf`, and
+`/transitiveMemberOf` are wired today; administrative units, app role
+assignments, delegated permission grants, and
+application/service-principal relationships remain unresolved and are not
+modelled yet (see `.github/carl/memory.md`).
+
 ## Milestone 4 — investigation UI
 
 - Query panel

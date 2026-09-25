@@ -44,6 +44,7 @@
     "src/microsoftGraph": "",
     "src/microsoftGraph/client": "",
     "src/microsoftGraph/dto": "",
+    "src/microsoftGraph/ingestion": "",
     "src/tests": ""
   },
   "workflows": null,
@@ -386,6 +387,15 @@
         "trust_boundary": "repository",
         "policy_attachment_point": true,
         "agent_context": "Repository component at src/microsoftGraph/dto."
+      },
+      {
+        "id": "component:src/microsoftGraph/ingestion",
+        "kind": "component",
+        "path": "src/microsoftGraph/ingestion",
+        "criticality": "medium",
+        "trust_boundary": "repository",
+        "policy_attachment_point": true,
+        "agent_context": "Repository component at src/microsoftGraph/ingestion."
       },
       {
         "id": "component:src/tests",
@@ -1273,6 +1283,14 @@
         "type": "contains",
         "evidence": [
           "src/microsoftGraph/dto"
+        ]
+      },
+      {
+        "from": "component:src/microsoftGraph",
+        "to": "component:src/microsoftGraph/ingestion",
+        "type": "contains",
+        "evidence": [
+          "src/microsoftGraph/ingestion"
         ]
       },
       {

@@ -86,4 +86,61 @@ describe('GraphClient', () => {
       expect(mapGraphError(error).message).toContain('12 seconds');
     }
   });
+
+  it('follows @odata.nextLink to combine paginated memberOf results', async () => {
+    const fetchImpl = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            value: [{ id: 'group-1', '@odata.type': '#microsoft.graph.group' }],
+            '@odata.nextLink': 'https://graph.example.test/v1.0/users/user-1/memberOf?page=2',
+          }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } },
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            value: [{ id: 'group-2', '@odata.type': '#microsoft.graph.group' }],
+          }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } },
+        ),
+      );
+    const client = new GraphClient({
+      tokenProvider: () => Promise.resolve('access-token'),
+      baseUrl: 'https://graph.example.test/v1.0',
+      fetchImpl,
+    });
+
+    const memberships = await client.getMemberOf('user-1');
+
+    expect(memberships).toHaveLength(2);
+    expect(memberships.map((membership) => membership.id)).toEqual(['group-1', 'group-2']);
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
+    expect(fetchImpl.mock.calls[1]?.[0]).toBe(
+      'https://graph.example.test/v1.0/users/user-1/memberOf?page=2',
+    );
+  });
+
+  it('addresses the signed-in user via /me rather than /users/me', async () => {
+    const fetchImpl = vi.fn<typeof fetch>().mockResolvedValue(
+      new Response(JSON.stringify({ value: [] }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    );
+    const client = new GraphClient({
+      tokenProvider: () => Promise.resolve('access-token'),
+      baseUrl: 'https://graph.example.test/v1.0',
+      fetchImpl,
+    });
+
+    await client.getTransitiveMemberOf('me');
+
+    expect(fetchImpl).toHaveBeenCalledWith(
+      'https://graph.example.test/v1.0/me/transitiveMemberOf',
+      expect.anything(),
+    );
+  });
 });
