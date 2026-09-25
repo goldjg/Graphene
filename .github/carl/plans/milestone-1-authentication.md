@@ -54,6 +54,8 @@ display the authenticated identity and tenant context.
 
 - App initializes MSAL with its encrypted local-storage cache so accounts,
   tokens, and redirect metadata survive mobile browser context changes.
+- Sign-in initiated on an ephemeral deployment origin is handed to the
+  configured canonical origin before MSAL starts.
 - Signed-in users are resolved with `/me`.
 - The authenticated account tenant ID is available as runtime context.
 - Login and logout controls are available.
@@ -67,6 +69,8 @@ display the authenticated identity and tenant context.
 - Login requests use exactly `User.Read` and `Directory.Read.All`.
 - MSAL config uses MSAL v4 encrypted local storage for accounts, tokens, and
   temporary redirect metadata, plus the `organizations` authority.
+- Authentication requests use the explicitly configured canonical redirect URI
+  rather than trusting the current deploy-preview origin.
 - `/me` requests are made through the Graph client with bearer auth.
 - 403 Graph responses produce a permission-focused error.
 

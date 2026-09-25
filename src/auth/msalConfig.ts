@@ -11,12 +11,14 @@ import type { AppConfig } from '../config/environment.ts';
 export const graphLoginScopes = ['User.Read', 'Directory.Read.All'] as const;
 
 export function createMsalConfig(config: AppConfig): Configuration {
+  const redirectUri = getAuthRedirectUri(config);
+
   return {
     auth: {
       clientId: config.auth.clientId,
       authority: config.auth.authority,
-      redirectUri: window.location.origin,
-      postLogoutRedirectUri: window.location.origin,
+      redirectUri,
+      postLogoutRedirectUri: redirectUri,
       navigateToLoginRequestUrl: false,
     },
     cache: {
@@ -33,6 +35,10 @@ export function createMsalConfig(config: AppConfig): Configuration {
       },
     },
   };
+}
+
+export function getAuthRedirectUri(config: AppConfig): string {
+  return config.auth.redirectUri ?? `${window.location.origin}/`;
 }
 
 export function createGraphLoginRequest(): RedirectRequest & PopupRequest {

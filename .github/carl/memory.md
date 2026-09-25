@@ -47,6 +47,9 @@ MSAL v4 encrypted local storage holds accounts, tokens, and temporary redirect
 metadata so mobile browsers can recover authentication when the response
 returns through a different browsing context. Application code must not read,
 log, or expose those cache entries directly.
+Authentication starts and completes on an explicitly configured canonical
+origin. Ephemeral Netlify deploy-preview origins hand sign-in to that origin
+before invoking MSAL and are never registered or trusted dynamically.
 
 Initial delegated Microsoft Graph scopes are exactly:
 

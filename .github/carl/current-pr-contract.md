@@ -36,6 +36,8 @@ Graphene truths unless explicitly amended in a future cARL contract and ADR.
 - Safe Vite environment configuration.
 - Cross-context authentication cache recovery for mobile browsers using MSAL
   v4 encrypted local storage.
+- Canonical-origin handoff before authentication when Graphene is opened from
+  an ephemeral Netlify deploy-preview URL.
 - Unit tests for Milestone 0 configuration invariants.
 - Milestone 0 documentation.
 
@@ -77,6 +79,9 @@ name is Graphene.
 - MSAL v4 encrypted local storage may hold accounts, tokens, and temporary
   redirect metadata for mobile cross-context recovery. Application code must
   not directly read, log, or expose those cache entries.
+- OAuth authorization and redirect handling must occur on the same explicitly
+  configured and Entra-registered origin; deploy previews must not become
+  implicitly trusted redirect origins.
 - No production Graph response logging.
 - Graph strings are untrusted input.
 - React escaping must remain intact.

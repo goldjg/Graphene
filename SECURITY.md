@@ -32,6 +32,9 @@ a public issue with exploit details.
 - Use MSAL v4's encrypted local-storage cache for cross-context mobile redirect
   recovery. Do not read, copy, log, or expose its cached accounts, tokens,
   encryption material, or temporary PKCE/state metadata.
+- Start and complete authentication on the configured canonical origin.
+  Ephemeral Netlify deploy-preview origins must hand sign-in to that origin
+  rather than being dynamically trusted or registered as redirect URIs.
 
 ## Trust flow
 

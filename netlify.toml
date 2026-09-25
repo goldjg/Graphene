@@ -2,6 +2,9 @@
   command = "npm run build"
   publish = "dist"
 
+[build.environment]
+  VITE_ENTRA_REDIRECT_URI = "https://graphene-ms.netlify.app/"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"

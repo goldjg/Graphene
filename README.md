@@ -99,6 +99,7 @@ the app registration:
 ```text
 cp .env.example .env.local
 VITE_ENTRA_CLIENT_ID=<your SPA application client ID>
+VITE_ENTRA_REDIRECT_URI=http://localhost:5173/
 ```
 
 Do not add a tenant ID. Graphene always uses the Microsoft Entra
@@ -119,6 +120,12 @@ when mobile Safari returns the authentication response through a different
 browsing context. MSAL encrypts cached accounts and tokens using a key held in
 a session cookie, and removes temporary PKCE/state data after processing the
 response. Graphene never reads or logs cached token values directly.
+
+Netlify deploy previews have unique host names that cannot all be registered as
+Entra redirect URIs. When sign-in is selected from a preview, Graphene first
+hands the browser to the configured canonical production origin and starts
+MSAL there. This keeps the authorization request, PKCE state, token exchange,
+and registered redirect URI on one origin.
 
 If sign-in returns to the application without authenticating, confirm that:
 
@@ -158,6 +165,10 @@ site, and ensure the corresponding Netlify URL is registered as an SPA
 redirect URI in Microsoft Entra. Do not store tokens, client secrets,
 certificates, tenant IDs, or production-only confidential values in the
 repository.
+
+`netlify.toml` sets `VITE_ENTRA_REDIRECT_URI` to the canonical production URL,
+`https://graphene-ms.netlify.app/`. If the production site name or custom
+domain changes, update that value and the Entra SPA redirect URI together.
 
 ## Threat and security model summary
 

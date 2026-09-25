@@ -1,7 +1,7 @@
 import { BrowserCacheLocation } from '@azure/msal-browser';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createMsalConfig, createGraphLoginRequest } from './msalConfig.ts';
+import { createMsalConfig, createGraphLoginRequest, getAuthRedirectUri } from './msalConfig.ts';
 
 describe('MSAL configuration', () => {
   it('uses the organizations authority and redirect-safe cache locations', () => {
@@ -11,6 +11,7 @@ describe('MSAL configuration', () => {
       auth: {
         clientId: 'client-id',
         authority: 'https://login.microsoftonline.com/organizations',
+        redirectUri: 'https://graphene.example.test/',
         scopes: ['User.Read', 'Directory.Read.All'],
       },
     });
@@ -18,13 +19,27 @@ describe('MSAL configuration', () => {
     expect(config.auth).toMatchObject({
       clientId: 'client-id',
       authority: 'https://login.microsoftonline.com/organizations',
-      redirectUri: 'https://graphene.example.test',
-      postLogoutRedirectUri: 'https://graphene.example.test',
+      redirectUri: 'https://graphene.example.test/',
+      postLogoutRedirectUri: 'https://graphene.example.test/',
       navigateToLoginRequestUrl: false,
     });
     expect(config.cache?.cacheLocation).toBe(BrowserCacheLocation.LocalStorage);
     expect(config.cache?.temporaryCacheLocation).toBe(BrowserCacheLocation.LocalStorage);
     expect(config.cache?.storeAuthStateInCookie).toBe(false);
+  });
+
+  it('falls back to the current origin when no canonical redirect is configured', () => {
+    vi.stubGlobal('location', { origin: 'http://localhost:5173' });
+
+    expect(
+      getAuthRedirectUri({
+        auth: {
+          clientId: 'client-id',
+          authority: 'https://login.microsoftonline.com/organizations',
+          scopes: ['User.Read', 'Directory.Read.All'],
+        },
+      }),
+    ).toBe('http://localhost:5173/');
   });
 
   it('requests exactly the approved delegated scopes', () => {

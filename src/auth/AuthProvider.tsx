@@ -12,7 +12,8 @@ import { mapGraphError } from '../microsoftGraph/client/errors.ts';
 import type { GraphUser } from '../microsoftGraph/dto/user.ts';
 import { AuthContext, type AuthContextValue, type AuthStatus } from './AuthContext.ts';
 import { mapAuthError, type UserFacingError } from './errors.ts';
-import { createGraphLoginRequest, createMsalConfig } from './msalConfig.ts';
+import { createGraphLoginRequest, createMsalConfig, getAuthRedirectUri } from './msalConfig.ts';
+import { consumeSignInHandoff, createSignInHandoffUrl } from './redirectHandoff.ts';
 
 export function AuthProvider({ config, children }: PropsWithChildren<{ config: AppConfig }>) {
   const msal = useMemo(() => new PublicClientApplication(createMsalConfig(config)), [config]);
@@ -94,6 +95,14 @@ export function AuthProvider({ config, children }: PropsWithChildren<{ config: A
         setActiveAccount(nextAccount);
 
         if (!nextAccount) {
+          const handoff = consumeSignInHandoff(window.location.href);
+
+          if (handoff.requested) {
+            window.history.replaceState(window.history.state, '', handoff.cleanUrl);
+            await msal.loginRedirect(createGraphLoginRequest());
+            return;
+          }
+
           setStatus('unauthenticated');
           return;
         }
@@ -116,8 +125,15 @@ export function AuthProvider({ config, children }: PropsWithChildren<{ config: A
 
   const signIn = useCallback(async () => {
     setError(null);
+    const handoffUrl = createSignInHandoffUrl(window.location.href, getAuthRedirectUri(config));
+
+    if (handoffUrl) {
+      window.location.assign(handoffUrl);
+      return;
+    }
+
     await msal.loginRedirect(createGraphLoginRequest());
-  }, [msal]);
+  }, [config, msal]);
 
   const signOut = useCallback(async () => {
     setError(null);
