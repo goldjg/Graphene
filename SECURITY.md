@@ -37,6 +37,8 @@ a public issue with exploit details.
   rather than being dynamically trusted or registered as redirect URIs.
 - Do not synchronize application query state into the URL until MSAL has
   finished processing any OAuth response parameters.
+- Keep browser API calls receiver-safe; do not detach native `Window` methods
+  such as `fetch`.
 
 ## Trust flow
 

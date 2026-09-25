@@ -84,6 +84,8 @@ name is Graphene.
   implicitly trusted redirect origins.
 - Application query-state synchronization must not rewrite the URL while MSAL
   is processing an OAuth redirect response.
+- Browser Graph requests must invoke the native fetch function with its
+  required global receiver.
 - No production Graph response logging.
 - Graph strings are untrusted input.
 - React escaping must remain intact.

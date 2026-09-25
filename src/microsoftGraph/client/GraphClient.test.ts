@@ -4,6 +4,28 @@ import { GraphClient } from './GraphClient.ts';
 import { GraphApiError, mapGraphError } from './errors.ts';
 
 describe('GraphClient', () => {
+  it('binds the default browser fetch to its global receiver', async () => {
+    const response = new Response(JSON.stringify({ id: 'user-id' }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+    const browserFetch = vi.fn(function (this: unknown) {
+      if (this !== globalThis) {
+        throw new TypeError('Can only call Window.fetch on instances of Window');
+      }
+
+      return Promise.resolve(response);
+    });
+    vi.stubGlobal('fetch', browserFetch);
+
+    const client = new GraphClient({
+      tokenProvider: () => Promise.resolve('access-token'),
+    });
+
+    await expect(client.getCurrentUser()).resolves.toMatchObject({ id: 'user-id' });
+    expect(browserFetch.mock.calls[0]?.[0]).toBe('https://graph.microsoft.com/v1.0/me');
+  });
+
   it('calls /me with a bearer token', async () => {
     const fetchImpl = vi.fn<typeof fetch>().mockResolvedValue(
       new Response(

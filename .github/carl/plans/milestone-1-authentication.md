@@ -74,6 +74,8 @@ display the authenticated identity and tenant context.
 - Investigation query-state synchronization waits until authentication
   initialization completes so it cannot remove OAuth response parameters
   before MSAL processes them.
+- Graph client requests preserve the browser fetch receiver required by mobile
+  Safari.
 - `/me` requests are made through the Graph client with bearer auth.
 - 403 Graph responses produce a permission-focused error.
 

@@ -36,7 +36,7 @@ export class GraphClient {
   }: GraphClientOptions) {
     this.tokenProvider = tokenProvider;
     this.baseUrl = baseUrl.replace(/\/$/, '');
-    this.fetchImpl = fetchImpl ?? fetch;
+    this.fetchImpl = fetchImpl ?? ((input, init) => globalThis.fetch(input, init));
   }
 
   async getCurrentUser(signal?: AbortSignal): Promise<GraphUser> {

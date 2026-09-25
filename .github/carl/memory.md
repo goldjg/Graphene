@@ -53,6 +53,9 @@ before invoking MSAL and are never registered or trusted dynamically.
 URL-backed investigation state must not rewrite the location while MSAL
 authentication is initializing because OAuth response parameters are delivered
 through that same URL.
+The Graph client wraps the browser's native fetch call through `globalThis`
+instead of detaching the method, because mobile Safari requires the Window
+receiver.
 
 Initial delegated Microsoft Graph scopes are exactly:
 
