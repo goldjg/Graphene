@@ -9,7 +9,14 @@ describe('GraphClient', () => {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
-    const browserFetch = vi.fn(function (this: unknown) {
+    const browserFetch = vi.fn<typeof fetch>(function (
+      this: unknown,
+      input: RequestInfo | URL,
+      init?: RequestInit,
+    ) {
+      void input;
+      void init;
+
       if (this !== globalThis) {
         throw new TypeError('Can only call Window.fetch on instances of Window');
       }
