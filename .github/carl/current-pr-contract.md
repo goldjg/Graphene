@@ -2,8 +2,8 @@
 
 ## Goal
 
-Deliver Graphene Milestone 0: cARL governance, Vite + React + TypeScript
-foundation, Netlify static SPA configuration, safe environment configuration,
+Maintain Graphene as a static Vite + React + TypeScript SPA with safe
+multi-tenant Microsoft Entra authentication configuration, Netlify deployment,
 and baseline documentation using Graphene as the product name.
 
 ## Contract status
@@ -46,7 +46,7 @@ name is Graphene.
 
 - Using the earlier working name in product UI, package metadata, or
   documentation headings.
-- Entra `common`, `organizations`, or `consumers` authorities.
+- Entra `common` or `consumers` authorities.
 - Graph scopes beyond `User.Read` and `Directory.Read.All`.
 - Graph write operations.
 - Client secrets, certificates, access tokens, refresh tokens, tenant secrets,
@@ -59,6 +59,9 @@ name is Graphene.
 - Vite + React + TypeScript frontend stack.
 - npm package management.
 - MSAL Browser and Cytoscape are first-class planned dependencies.
+- Graphene uses its own multi-tenant public SPA registration with the
+  `organizations` authority; the investigated tenant comes from the
+  authenticated account context.
 - Microsoft Graph DTOs must remain separate from normalized graph-domain
   objects in future milestones.
 - Relationship provenance is mandatory for graph relationships in future
@@ -103,9 +106,9 @@ name is Graphene.
 
 ## Stop conditions
 
-Stop if Milestone 0 requires adding a backend, secret, Graph write permission,
-application permission, broader delegated scope, or non-tenant-specific
-authority.
+Stop if authentication requires adding a backend, secret, Graph write
+permission, application permission, broader delegated scope, or an authority
+outside `organizations`.
 
 ## Escalation triggers
 

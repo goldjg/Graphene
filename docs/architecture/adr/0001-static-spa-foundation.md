@@ -10,8 +10,10 @@ Graphene needs to let security engineers investigate Microsoft Entra access
 relationships while preserving least privilege, avoiding confidential browser
 credentials, and staying deployable as a static Netlify site.
 
-The initial product must use a single-tenant Microsoft Entra SPA application
-registration with Authorization Code Flow and PKCE through MSAL Browser.
+The initial product must use Graphene's own multi-tenant Microsoft Entra SPA
+application registration with Authorization Code Flow and PKCE through MSAL
+Browser. The `organizations` authority is used so the tenant is not
+hardcoded; the authenticated account supplies the tenant context.
 Initial delegated Microsoft Graph scopes are exactly `User.Read` and
 `Directory.Read.All`.
 
@@ -31,14 +33,14 @@ The initial architecture has:
 - no Microsoft Graph write permissions;
 - no telemetry or third-party analytics by default.
 
-The app uses `VITE_ENTRA_CLIENT_ID` and `VITE_ENTRA_TENANT_ID` as public SPA
-configuration and constructs a tenant-specific authority:
+The app uses `VITE_ENTRA_CLIENT_ID` as public SPA configuration and uses the
+fixed organizations authority:
 
 ```text
-https://login.microsoftonline.com/${VITE_ENTRA_TENANT_ID}
+https://login.microsoftonline.com/organizations
 ```
 
-The aliases `common`, `organizations`, and `consumers` are forbidden.
+The aliases `common` and `consumers` are forbidden.
 
 ## Consequences
 
@@ -48,4 +50,5 @@ server component. Features that require Microsoft Graph permissions beyond
 future optional capabilities rather than silently expanding scopes.
 
 Any future backend, persistence layer, telemetry, optional permission, or
-multi-tenant support requires a new ADR and cARL invariant review.
+change to the supported-account boundary requires a new ADR and cARL invariant
+review.

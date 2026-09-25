@@ -13,8 +13,8 @@ export function App() {
         <h1 id="graphene-title">Graphene</h1>
         <p className="lede">
           A provenance-aware static SPA for exploring how identities relate to Microsoft Entra
-          resources. Authentication uses a single-tenant public SPA registration and the approved
-          User.Read plus Directory.Read.All delegated permission baseline.
+          resources. Authentication uses Graphene's multi-tenant public SPA registration and the
+          approved User.Read plus Directory.Read.All delegated permission baseline.
         </p>
       </section>
 
@@ -31,7 +31,7 @@ export function App() {
           </div>
           <div>
             <dt>Authority</dt>
-            <dd>{configResult.ok ? configResult.authority : 'Waiting for tenant configuration'}</dd>
+            <dd>{configResult.ok ? configResult.authority : 'Waiting for client configuration'}</dd>
           </div>
         </dl>
 
@@ -71,7 +71,7 @@ function readConfig(): ConfigReadResult {
 }
 
 function AuthStatusPanel() {
-  const { currentUser, error, refreshIdentity, signIn, signOut, status } = useAuth();
+  const { account, currentUser, error, refreshIdentity, signIn, signOut, status } = useAuth();
 
   if (status === 'initializing') {
     return (
@@ -111,6 +111,10 @@ function AuthStatusPanel() {
             <div>
               <dt>Object ID</dt>
               <dd>{currentUser.id}</dd>
+            </div>
+            <div>
+              <dt>Tenant ID</dt>
+              <dd>{account?.tenantId ?? 'Not returned by Microsoft Entra'}</dd>
             </div>
           </dl>
         </div>

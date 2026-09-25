@@ -39,8 +39,10 @@ with delegated access tokens.
 
 ## Authentication and Graph permission baseline
 
-Graphene requires a single-tenant Microsoft Entra SPA app registration using
-Authorization Code Flow with PKCE via MSAL Browser.
+Graphene uses its own multi-tenant Microsoft Entra SPA app registration using
+Authorization Code Flow with PKCE via MSAL Browser. The `organizations`
+authority permits work/school accounts without hardcoding an Entra tenant; the
+authenticated account's tenant context identifies the tenant being investigated.
 
 Initial delegated Microsoft Graph scopes are exactly:
 
@@ -56,9 +58,9 @@ explicitly and report that it is unavailable under the current baseline.
 
 - SPA only initially.
 - Netlify static hosting.
-- Tenant-specific authority only:
-  `https://login.microsoftonline.com/${VITE_ENTRA_TENANT_ID}`.
-- No `common`, `organizations`, or `consumers` authority.
+- Organizations authority only:
+  `https://login.microsoftonline.com/organizations`.
+- No `common` or `consumers` authority.
 - No backend.
 - No client secret or certificate.
 - No write permissions.

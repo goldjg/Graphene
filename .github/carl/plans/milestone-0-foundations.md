@@ -29,8 +29,9 @@ Implement Milestone 0:
 - Configure npm scripts for development, linting, testing, and production
   build.
 - Add Netlify static hosting configuration, SPA fallback, and security headers.
-- Add safe environment-variable configuration using `VITE_ENTRA_CLIENT_ID` and
-  `VITE_ENTRA_TENANT_ID`.
+- Add safe environment-variable configuration using only the public
+  `VITE_ENTRA_CLIENT_ID`; derive the investigated tenant from authenticated
+  account context.
 - Add README, SECURITY, roadmap, and architecture decision documentation.
 
 ## Non-goals
@@ -53,8 +54,7 @@ Implement Milestone 0:
 
 ## Forbidden scope
 
-- Multi-tenant authentication.
-- `common`, `organizations`, or `consumers` Entra authorities.
+- `common` or `consumers` Entra authorities.
 - Client secrets, certificates, production tenant IDs, tokens, or credentials.
 - Graph write operations or application permissions.
 - Telemetry, analytics, or production Graph response logging.
@@ -73,7 +73,7 @@ public SPA environment variables.
 - Product name is Graphene.
 - SPA only initially.
 - Netlify static hosting.
-- Single-tenant authentication.
+- Multi-tenant authentication through the `organizations` authority.
 - No backend.
 - No client secret or certificate.
 - Initial delegated scopes are exactly `User.Read` and `Directory.Read.All`.
@@ -126,11 +126,11 @@ public SPA environment variables.
 
 ## Contract assertions
 
-- The authority builder rejects `common`, `organizations`, and `consumers`.
+- The authority is the fixed `organizations` authority.
 - The configured Graph scope baseline is exactly `User.Read` and
   `Directory.Read.All`.
 - Missing Vite environment variables produce explicit configuration errors.
-- The authority string is tenant specific.
+- No tenant ID is required in environment configuration.
 
 ## Test strategy
 

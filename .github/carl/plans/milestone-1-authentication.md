@@ -9,14 +9,16 @@
 
 ## Task summary
 
-Implement single-tenant Microsoft Entra authentication with MSAL Browser using
-only `User.Read` and `Directory.Read.All`, then call Microsoft Graph `/me` and
-display the authenticated identity.
+Implement multi-tenant Microsoft Entra authentication with Graphene's own
+public SPA registration using the `organizations` authority, only
+`User.Read` and `Directory.Read.All`, then call Microsoft Graph `/me` and
+display the authenticated identity and tenant context.
 
 ## Goal
 
 - Create a small authentication abstraction.
-- Use tenant-specific MSAL configuration from Milestone 0 environment config.
+- Use the public SPA client ID from environment configuration and the fixed
+  `organizations` authority.
 - Request only the approved delegated scopes.
 - Prefer silent token acquisition and use interactive redirect flows only when
   needed.
@@ -43,7 +45,7 @@ display the authenticated identity.
 ## Forbidden scope
 
 - Any scope beyond `User.Read` and `Directory.Read.All`.
-- `common`, `organizations`, or `consumers` authorities.
+- `common` or `consumers` authorities.
 - Client secrets or certificates.
 - Token logging or raw-token display.
 - Production Graph response logging.
@@ -52,6 +54,7 @@ display the authenticated identity.
 
 - App initializes MSAL using session-scoped browser cache.
 - Signed-in users are resolved with `/me`.
+- The authenticated account tenant ID is available as runtime context.
 - Login and logout controls are available.
 - Auth errors distinguish cancellation, missing admin consent/access denied,
   interaction-required, and generic auth failures.
@@ -61,7 +64,7 @@ display the authenticated identity.
 ## Contract assertions
 
 - Login requests use exactly `User.Read` and `Directory.Read.All`.
-- MSAL config uses session storage and tenant-specific authority.
+- MSAL config uses session storage and the `organizations` authority.
 - `/me` requests are made through the Graph client with bearer auth.
 - 403 Graph responses produce a permission-focused error.
 
@@ -73,4 +76,4 @@ request/error behavior with mocked fetch.
 ## Stop conditions
 
 Stop if authentication requires broader scopes, a backend, a client secret, or
-a non-tenant-specific authority.
+an authority outside `organizations`.

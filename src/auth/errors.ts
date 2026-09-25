@@ -38,7 +38,7 @@ export function mapAuthError(error: unknown): UserFacingError {
     return {
       title: 'Authentication failed',
       message: error.errorMessage || error.message,
-      remediation: 'Check the tenant-specific app registration and try signing in again.',
+      remediation: 'Check Graphene app consent and try signing in again.',
     };
   }
 

@@ -14,7 +14,7 @@ constraints, and testability stay intact.
 
 ## Milestone 1 — authentication
 
-- MSAL Browser single-tenant authentication
+- MSAL Browser multi-tenant authentication through `organizations`
 - `User.Read` and `Directory.Read.All` only
 - `/me` call and authenticated identity display
 - Login/logout

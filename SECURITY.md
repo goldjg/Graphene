@@ -23,8 +23,8 @@ a public issue with exploit details.
   `Directory.Read.All`.
 - Do not introduce write permissions or application permissions.
 - Do not log or display access tokens.
-- Do not commit tenant-specific secrets, access tokens, refresh tokens, client
-  secrets, certificates, or production-only confidential identifiers.
+- Do not commit tenant-specific identifiers, access tokens, refresh tokens,
+  client secrets, certificates, or production-only confidential identifiers.
 - Treat Microsoft Graph strings as untrusted input.
 - Do not use `dangerouslySetInnerHTML`.
 - Do not dynamically execute Graph-derived content.
@@ -34,7 +34,7 @@ a public issue with exploit details.
 
 ```text
 Browser-hosted Graphene SPA
-  -> Microsoft Entra single-tenant sign-in via MSAL Browser
+  -> Microsoft Entra organizations sign-in via MSAL Browser
   -> delegated access token for User.Read + Directory.Read.All
   -> Microsoft Graph REST API
   -> normalized provenance-aware graph model

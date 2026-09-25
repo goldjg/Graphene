@@ -4,21 +4,20 @@ import { describe, expect, it, vi } from 'vitest';
 import { createMsalConfig, createGraphLoginRequest } from './msalConfig.ts';
 
 describe('MSAL configuration', () => {
-  it('uses the tenant-specific authority and session storage', () => {
+  it('uses the organizations authority and session storage', () => {
     vi.stubGlobal('location', { origin: 'https://graphene.example.test' });
 
     const config = createMsalConfig({
       auth: {
         clientId: 'client-id',
-        tenantId: 'tenant-id',
-        authority: 'https://login.microsoftonline.com/tenant-id',
+        authority: 'https://login.microsoftonline.com/organizations',
         scopes: ['User.Read', 'Directory.Read.All'],
       },
     });
 
     expect(config.auth).toMatchObject({
       clientId: 'client-id',
-      authority: 'https://login.microsoftonline.com/tenant-id',
+      authority: 'https://login.microsoftonline.com/organizations',
       redirectUri: 'https://graphene.example.test',
       postLogoutRedirectUri: 'https://graphene.example.test',
       navigateToLoginRequestUrl: false,
