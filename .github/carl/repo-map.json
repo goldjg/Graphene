@@ -37,6 +37,7 @@
     "src/features": "",
     "src/features/details": "",
     "src/features/graphExplorer": "",
+    "src/features/investigation": "",
     "src/graph": "",
     "src/graph/cytoscape": "",
     "src/graph/model": "",
@@ -324,6 +325,15 @@
         "trust_boundary": "repository",
         "policy_attachment_point": true,
         "agent_context": "Repository component at src/features/graphExplorer."
+      },
+      {
+        "id": "component:src/features/investigation",
+        "kind": "component",
+        "path": "src/features/investigation",
+        "criticality": "medium",
+        "trust_boundary": "repository",
+        "policy_attachment_point": true,
+        "agent_context": "Repository component at src/features/investigation."
       },
       {
         "id": "component:src/graph",
@@ -1243,6 +1253,14 @@
         "type": "contains",
         "evidence": [
           "src/features/graphExplorer"
+        ]
+      },
+      {
+        "from": "component:src/features",
+        "to": "component:src/features/investigation",
+        "type": "contains",
+        "evidence": [
+          "src/features/investigation"
         ]
       },
       {

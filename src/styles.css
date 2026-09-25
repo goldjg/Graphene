@@ -234,3 +234,43 @@ dd {
     grid-template-columns: 1fr;
   }
 }
+
+.query-panel fieldset {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid rgb(143 183 255 / 25%);
+  border-radius: 0.75rem;
+  background: rgb(15 23 42 / 72%);
+}
+
+.query-panel legend {
+  padding: 0 0.35rem;
+  color: #8fb7ff;
+  font-weight: 700;
+}
+
+.query-mode {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  color: #bfd0e7;
+}
+
+.query-target,
+.query-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #bfd0e7;
+}
+
+.query-target input[type="text"] {
+  flex: 1;
+  min-width: 16rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: 0.5rem;
+  border: 1px solid #8fb7ff;
+  background: #0f172a;
+  color: #ffffff;
+}

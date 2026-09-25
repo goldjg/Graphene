@@ -9,13 +9,14 @@ import type { GraphLayoutId } from '../../graph/cytoscape/layouts.ts';
 import { demoInvestigationGraph } from '../../graph/model/demoFixture.ts';
 import type { InvestigationGraph } from '../../graph/model/types.ts';
 import { toCytoscapeElements } from '../../graph/transforms/toCytoscapeElements.ts';
+import { QueryPanel } from '../investigation/QueryPanel.tsx';
 import { DetailsPanel } from './DetailsPanel.tsx';
 import { GraphToolbar } from './GraphToolbar.tsx';
 
 /**
  * Feature-level investigation canvas: renders whatever `InvestigationGraph`
- * is currently loaded (demo data today; Microsoft Graph ingestion in a later
- * milestone) alongside view controls and a selection details panel.
+ * is currently loaded (demo data, or a live Microsoft Graph investigation
+ * from `QueryPanel`) alongside view controls and a selection details panel.
  */
 export function GraphExplorer() {
   const [graph, setGraph] = useState<InvestigationGraph | null>(null);
@@ -30,6 +31,16 @@ export function GraphExplorer() {
     setSelection(null);
   };
 
+  const handleQueryResult = (result: InvestigationGraph) => {
+    setGraph(result);
+    setSelection(null);
+  };
+
+  const handleQueryReset = () => {
+    setGraph(null);
+    setSelection(null);
+  };
+
   const setCanvasRef = useCallback((handle: GraphCanvasHandle | null) => {
     setCanvasHandle(handle);
   }, []);
@@ -40,6 +51,8 @@ export function GraphExplorer() {
       <p className="setup-ready" role="status">
         Demo data is clearly labelled sample data. Loading it never calls Microsoft Graph.
       </p>
+
+      <QueryPanel onResult={handleQueryResult} onReset={handleQueryReset} />
 
       <GraphToolbar
         graph={graph}

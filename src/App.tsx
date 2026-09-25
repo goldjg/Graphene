@@ -39,14 +39,17 @@ export function App() {
           <p className="setup-warning" role="status">
             {configResult.message}
           </p>
-        ) : (
-          <AuthProvider config={configResult.config}>
-            <AuthStatusPanel />
-          </AuthProvider>
-        )}
+        ) : null}
       </section>
 
-      <GraphExplorer />
+      {configResult.ok ? (
+        <AuthProvider config={configResult.config}>
+          <section className="status-card" aria-label="Identity status">
+            <AuthStatusPanel />
+          </section>
+          <GraphExplorer />
+        </AuthProvider>
+      ) : null}
     </main>
   );
 }

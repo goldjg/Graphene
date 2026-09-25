@@ -55,6 +55,11 @@ modelled yet (see `.github/carl/memory.md`).
 - Direct/inherited relationship toggle
 - Empty, loading, and error states
 
+Status: implemented. The query panel supports investigating the signed-in
+user or an explicit object ID/UPN, with a query-time include-inherited
+toggle, URL query-state sync (no secrets/tokens are ever encoded), and
+loading/error/unauthenticated states.
+
 ## Milestone 5 — filtering
 
 - Object-type filtering

@@ -26,6 +26,24 @@ vi.mock('cytoscape', () => {
   return { default: vi.fn(() => core) };
 });
 
+/**
+ * GraphExplorer renders QueryPanel, which requires an AuthProvider context.
+ * These tests exercise demo-data flows only, so useAuth is mocked directly
+ * to avoid standing up MSAL.
+ */
+vi.mock('../../auth/useAuth.ts', () => ({
+  useAuth: () => ({
+    status: 'unauthenticated',
+    account: null,
+    currentUser: null,
+    error: null,
+    signIn: vi.fn(),
+    signOut: vi.fn(),
+    refreshIdentity: vi.fn(),
+    getGraphClient: () => null,
+  }),
+}));
+
 describe('GraphExplorer', () => {
   it('shows no graph loaded until demo data is requested', () => {
     render(<GraphExplorer />);

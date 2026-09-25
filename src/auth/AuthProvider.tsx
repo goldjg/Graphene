@@ -125,6 +125,16 @@ export function AuthProvider({ config, children }: PropsWithChildren<{ config: A
     await msal.logoutRedirect(activeAccount ? { account: activeAccount } : {});
   }, [msal]);
 
+  const getGraphClient = useCallback((): GraphClient | null => {
+    const activeAccount = msal.getActiveAccount();
+
+    if (!activeAccount) {
+      return null;
+    }
+
+    return new GraphClient({ tokenProvider: () => acquireGraphToken(activeAccount) });
+  }, [acquireGraphToken, msal]);
+
   const value = useMemo<AuthContextValue>(
     () => ({
       status,
@@ -134,8 +144,9 @@ export function AuthProvider({ config, children }: PropsWithChildren<{ config: A
       signIn,
       signOut,
       refreshIdentity,
+      getGraphClient,
     }),
-    [account, currentUser, error, refreshIdentity, signIn, signOut, status],
+    [account, currentUser, error, getGraphClient, refreshIdentity, signIn, signOut, status],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
