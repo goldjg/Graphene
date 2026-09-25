@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { createMsalConfig, createGraphLoginRequest } from './msalConfig.ts';
 
 describe('MSAL configuration', () => {
-  it('uses the organizations authority and session storage', () => {
+  it('uses the organizations authority and redirect-safe cache locations', () => {
     vi.stubGlobal('location', { origin: 'https://graphene.example.test' });
 
     const config = createMsalConfig({
@@ -23,6 +23,7 @@ describe('MSAL configuration', () => {
       navigateToLoginRequestUrl: false,
     });
     expect(config.cache?.cacheLocation).toBe(BrowserCacheLocation.SessionStorage);
+    expect(config.cache?.temporaryCacheLocation).toBe(BrowserCacheLocation.LocalStorage);
     expect(config.cache?.storeAuthStateInCookie).toBe(false);
   });
 

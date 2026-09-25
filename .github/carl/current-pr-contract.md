@@ -12,7 +12,7 @@ active
 
 ## Non-goals
 
-- MSAL sign-in implementation.
+- Replacing MSAL or changing the authorization-code-with-PKCE architecture.
 - Microsoft Graph API calls.
 - Cytoscape rendering.
 - Investigation query UX.
@@ -34,6 +34,8 @@ Graphene truths unless explicitly amended in a future cARL contract and ADR.
 - npm scripts and dependency lockfile.
 - Netlify deployment and security headers.
 - Safe Vite environment configuration.
+- Redirect-state recovery for mobile browsers while keeping tokens and
+  accounts session-scoped.
 - Unit tests for Milestone 0 configuration invariants.
 - Milestone 0 documentation.
 
@@ -72,6 +74,8 @@ name is Graphene.
 - Least privilege.
 - Read-only Graph access.
 - No token logging or raw-token display.
+- Durable MSAL accounts and tokens remain in session storage; only short-lived
+  redirect PKCE/state metadata may use local storage.
 - No production Graph response logging.
 - Graph strings are untrusted input.
 - React escaping must remain intact.

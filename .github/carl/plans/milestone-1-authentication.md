@@ -52,7 +52,8 @@ display the authenticated identity and tenant context.
 
 ## Acceptance criteria
 
-- App initializes MSAL using session-scoped browser cache.
+- App initializes MSAL with session-scoped account/token cache and
+  cross-context recovery for temporary redirect metadata.
 - Signed-in users are resolved with `/me`.
 - The authenticated account tenant ID is available as runtime context.
 - Login and logout controls are available.
@@ -64,7 +65,8 @@ display the authenticated identity and tenant context.
 ## Contract assertions
 
 - Login requests use exactly `User.Read` and `Directory.Read.All`.
-- MSAL config uses session storage and the `organizations` authority.
+- MSAL config uses session storage for accounts/tokens, local storage only for
+  temporary redirect metadata, and the `organizations` authority.
 - `/me` requests are made through the Graph client with bearer auth.
 - 403 Graph responses produce a permission-focused error.
 

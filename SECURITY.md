@@ -29,6 +29,9 @@ a public issue with exploit details.
 - Do not use `dangerouslySetInnerHTML`.
 - Do not dynamically execute Graph-derived content.
 - Do not add telemetry or third-party analytics by default.
+- Keep accounts and tokens in session storage. Local storage may contain only
+  MSAL's short-lived redirect metadata needed to recover PKCE/state across
+  mobile browser context changes.
 
 ## Trust flow
 

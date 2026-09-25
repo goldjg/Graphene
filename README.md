@@ -112,6 +112,22 @@ This accepts work or school accounts from organizational directories and
 derives the investigated tenant from the authenticated account. Do not use
 `common` or `consumers`.
 
+### Browser redirect behavior
+
+Graphene keeps accounts and tokens in session storage. MSAL's short-lived
+redirect metadata is stored in local storage so sign-in can complete when
+mobile Safari returns the authentication response in a different browsing
+context. MSAL removes this temporary PKCE and state data after processing the
+response; Graphene does not persist access tokens in local storage.
+
+If sign-in returns to the application without authenticating, confirm that:
+
+- the exact deployed origin is registered under the **Single-page
+  application** platform;
+- the deployed `VITE_ENTRA_CLIENT_ID` matches that app registration;
+- the browser permits first-party storage for the Graphene site; and
+- `Directory.Read.All` has administrator consent.
+
 ## Local development
 
 ```bash

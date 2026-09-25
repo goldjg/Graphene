@@ -21,6 +21,9 @@ export function createMsalConfig(config: AppConfig): Configuration {
     },
     cache: {
       cacheLocation: BrowserCacheLocation.SessionStorage,
+      // iOS may complete a redirect in a different browsing context. Keep
+      // durable tokens session-scoped, but allow PKCE/state recovery there.
+      temporaryCacheLocation: BrowserCacheLocation.LocalStorage,
       storeAuthStateInCookie: false,
     },
     system: {
