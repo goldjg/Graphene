@@ -36,6 +36,15 @@ describe('QueryPanel', () => {
     ).toBeInTheDocument();
   });
 
+  it('preserves an OAuth response while authentication is initializing', () => {
+    window.history.replaceState(null, '', '/?code=auth-code&state=auth-state');
+    mockUseAuth.mockReturnValue({ status: 'initializing', getGraphClient: () => null });
+
+    render(<QueryPanel onResult={vi.fn()} onReset={vi.fn()} />);
+
+    expect(window.location.search).toBe('?code=auth-code&state=auth-state');
+  });
+
   it('validates that a search target is provided before querying', () => {
     mockUseAuth.mockReturnValue({
       status: 'authenticated',

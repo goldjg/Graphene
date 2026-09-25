@@ -37,14 +37,14 @@ export function QueryPanel({ onResult, onReset }: QueryPanelProps) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    if (typeof window === 'undefined') {
+    if (typeof window === 'undefined' || authStatus === 'initializing') {
       return;
     }
 
     const params = encodeQueryState(queryState);
     const url = `${window.location.pathname}?${params.toString()}`;
     window.history.replaceState(null, '', url);
-  }, [queryState]);
+  }, [authStatus, queryState]);
 
   const handleModeChange = (mode: InvestigationMode) => {
     setQueryState((current) => ({ ...current, mode }));

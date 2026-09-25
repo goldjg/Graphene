@@ -82,6 +82,8 @@ name is Graphene.
 - OAuth authorization and redirect handling must occur on the same explicitly
   configured and Entra-registered origin; deploy previews must not become
   implicitly trusted redirect origins.
+- Application query-state synchronization must not rewrite the URL while MSAL
+  is processing an OAuth redirect response.
 - No production Graph response logging.
 - Graph strings are untrusted input.
 - React escaping must remain intact.

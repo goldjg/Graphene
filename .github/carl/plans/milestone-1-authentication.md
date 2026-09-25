@@ -71,6 +71,9 @@ display the authenticated identity and tenant context.
   temporary redirect metadata, plus the `organizations` authority.
 - Authentication requests use the explicitly configured canonical redirect URI
   rather than trusting the current deploy-preview origin.
+- Investigation query-state synchronization waits until authentication
+  initialization completes so it cannot remove OAuth response parameters
+  before MSAL processes them.
 - `/me` requests are made through the Graph client with bearer auth.
 - 403 Graph responses produce a permission-focused error.
 

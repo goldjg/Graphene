@@ -50,6 +50,9 @@ log, or expose those cache entries directly.
 Authentication starts and completes on an explicitly configured canonical
 origin. Ephemeral Netlify deploy-preview origins hand sign-in to that origin
 before invoking MSAL and are never registered or trusted dynamically.
+URL-backed investigation state must not rewrite the location while MSAL
+authentication is initializing because OAuth response parameters are delivered
+through that same URL.
 
 Initial delegated Microsoft Graph scopes are exactly:
 

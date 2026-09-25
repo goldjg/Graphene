@@ -35,6 +35,8 @@ a public issue with exploit details.
 - Start and complete authentication on the configured canonical origin.
   Ephemeral Netlify deploy-preview origins must hand sign-in to that origin
   rather than being dynamically trusted or registered as redirect URIs.
+- Do not synchronize application query state into the URL until MSAL has
+  finished processing any OAuth response parameters.
 
 ## Trust flow
 
