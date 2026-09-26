@@ -10,7 +10,15 @@ export function App() {
     <main className="app-shell">
       <section className="hero" aria-labelledby="graphene-title">
         <p className="eyebrow">Microsoft Entra access investigation</p>
-        <h1 id="graphene-title">Graphene</h1>
+        <h1 id="graphene-title">
+          <img
+            className="hero-logo"
+            src="/graphene-logo.png"
+            alt="Graphene"
+            width={900}
+            height={369}
+          />
+        </h1>
         <p className="lede">
           A provenance-aware static SPA for exploring how identities relate to Microsoft Entra
           resources. Authentication uses Graphene's multi-tenant public SPA registration and the

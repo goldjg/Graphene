@@ -31,6 +31,7 @@
     "docs": "Documentation",
     "docs/architecture": "",
     "docs/architecture/adr": "",
+    "public": "",
     "src": "",
     "src/auth": "",
     "src/config": "",
@@ -273,6 +274,15 @@
         "trust_boundary": "repository",
         "policy_attachment_point": true,
         "agent_context": "Repository component at docs/architecture/adr."
+      },
+      {
+        "id": "component:public",
+        "kind": "component",
+        "path": "public",
+        "criticality": "medium",
+        "trust_boundary": "repository",
+        "policy_attachment_point": true,
+        "agent_context": "Repository component at public."
       },
       {
         "id": "component:src",
@@ -1385,6 +1395,14 @@
         "type": "contains",
         "evidence": [
           "docs"
+        ]
+      },
+      {
+        "from": "repository:.",
+        "to": "component:public",
+        "type": "contains",
+        "evidence": [
+          "public"
         ]
       },
       {

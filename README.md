@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="public/graphene-logo.png" alt="Graphene" width="520" />
+</p>
+
 # Graphene
 
 Graphene is an open-source Microsoft Entra access-path visualisation and

@@ -27,6 +27,21 @@ privilege-escalation engine, attack-path product, or risk-scoring system.
 The product and repository name is **Graphene**. Do not use the earlier working
 name in product UI, documentation headings, package names, or project metadata.
 
+## Branding assets
+
+Branding artwork lives in `public/` and is served from the site root:
+
+- `graphene-logo.png` is the wordmark. It is rendered inside the hero `<h1>`
+  with `alt="Graphene"`, which preserves the accessible name referenced by
+  `aria-labelledby="graphene-title"`, and is reused at the top of `README.md`.
+- `graphene-icon.png` is the 512px node-graph glyph master. `favicon.ico`,
+  `favicon-16x16.png`, `favicon-32x32.png`, `favicon-192x192.png`, and
+  `apple-touch-icon.png` are all derived from it.
+
+The artwork carries its own near-black backdrop, so the hero applies
+`mix-blend-mode: screen` to merge it into the page gradient. Regenerate icon
+variants from the glyph master rather than re-cropping the original artwork.
+
 ## Architecture summary
 
 Graphene is a static SPA hosted on Netlify and built with Vite, React,

@@ -77,6 +77,16 @@ h1 {
   line-height: 0.95;
 }
 
+/* The wordmark artwork carries its own near-black backdrop. Screen blending
+   drops that backdrop into the hero gradient so no rectangular seam shows. */
+.hero-logo {
+  display: block;
+  width: clamp(15rem, 42vw, 26rem);
+  max-width: 100%;
+  height: auto;
+  mix-blend-mode: screen;
+}
+
 h2 {
   margin-top: 0;
   color: #ffffff;

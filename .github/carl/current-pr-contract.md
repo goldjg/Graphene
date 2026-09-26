@@ -2,8 +2,9 @@
 
 ## Goal
 
-Fix Cytoscape relationship lines so every explicitly coloured edge type uses
-the same line and arrow colour shown in the Filters legend.
+Add the Graphene wordmark logo and favicon/app-icon assets, wire them into the
+SPA shell and README, and size the icon variants appropriately for browser and
+mobile home-screen use.
 
 ## Contract status
 
@@ -11,10 +12,11 @@ completed
 
 ## Active follow-up scope
 
-Only `src/graph/cytoscape/stylesheet.ts`, its focused tests, this contract, and
-the linked bug-fix plan are approved for the active follow-up. The broader
-sections below describe completed prior milestones and are historical context,
-not authorization for additional changes.
+Only `public/` branding assets, `index.html`, `src/App.tsx`, `src/styles.css`,
+`README.md`, this contract, and the linked branding plan are approved for the
+active follow-up. The broader sections below describe completed prior
+milestones and are historical context, not authorization for additional
+changes.
 
 ## Non-goals
 
