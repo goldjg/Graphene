@@ -38,8 +38,8 @@ Branding artwork lives in `public/` and is served from the site root:
   `favicon-16x16.png`, `favicon-32x32.png`, `favicon-192x192.png`, and
   `apple-touch-icon.png` are all derived from it.
 
-The artwork carries its own near-black backdrop, so the hero applies
-`mix-blend-mode: screen` to merge it into the page gradient. Regenerate icon
+The wordmark has a genuine alpha channel and must remain transparent so it
+renders cleanly over the hero gradient on all browsers. Regenerate icon
 variants from the glyph master rather than re-cropping the original artwork.
 
 ## Architecture summary

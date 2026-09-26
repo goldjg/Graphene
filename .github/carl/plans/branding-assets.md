@@ -52,3 +52,12 @@ was suitable for direct use.
 - A web app manifest or installable PWA behaviour.
 - Replacing the Cytoscape node badge icons, which remain generated SVG.
 - Any change to authentication, Microsoft Graph scopes, or ingestion.
+
+## Mobile rendering follow-up
+
+The deployed mobile screenshot showed that `mix-blend-mode: screen` did not
+hide the wordmark's baked-in rectangular backdrop. `public/graphene-logo.png`
+was replaced with a genuinely transparent RGBA image and the blend-mode
+workaround was removed. The rendered size and accessible markup remain
+unchanged; the HTML height metadata was corrected to match the asset's actual
+900x325 dimensions and avoid layout shift while it loads.

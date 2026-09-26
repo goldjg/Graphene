@@ -16,7 +16,7 @@ export function App() {
             src="/graphene-logo.png"
             alt="Graphene"
             width={900}
-            height={369}
+            height={325}
           />
         </h1>
         <p className="lede">

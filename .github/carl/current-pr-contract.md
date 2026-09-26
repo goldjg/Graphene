@@ -2,9 +2,8 @@
 
 ## Goal
 
-Add the Graphene wordmark logo and favicon/app-icon assets, wire them into the
-SPA shell and README, and size the icon variants appropriately for browser and
-mobile home-screen use.
+Remove the baked-in dark background from the Graphene wordmark so it renders
+cleanly over the SPA hero gradient, including on mobile Safari.
 
 ## Contract status
 
@@ -12,11 +11,11 @@ completed
 
 ## Active follow-up scope
 
-Only `public/` branding assets, `index.html`, `src/App.tsx`, `src/styles.css`,
-`README.md`, this contract, and the linked branding plan are approved for the
-active follow-up. The broader sections below describe completed prior
-milestones and are historical context, not authorization for additional
-changes.
+Only `public/graphene-logo.png`, `src/App.tsx`, `src/styles.css`, `README.md`,
+this contract, the branding plan, and directly related durable branding
+documentation are approved for the active follow-up. The broader sections
+below describe completed prior milestones and are historical context, not
+authorization for additional changes.
 
 ## Non-goals
 
