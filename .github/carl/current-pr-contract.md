@@ -2,9 +2,8 @@
 
 ## Goal
 
-Fix the node-type SVG badges so they render inside Cytoscape's canvas,
-including mobile Safari, without changing icon semantics, graph behavior,
-dependencies, endpoints, or Microsoft Graph permissions.
+Fix Cytoscape relationship lines so every explicitly coloured edge type uses
+the same line and arrow colour shown in the Filters legend.
 
 ## Contract status
 
@@ -12,10 +11,10 @@ completed
 
 ## Active follow-up scope
 
-Only `src/graph/cytoscape/icons.ts`, its focused tests, this contract, and the
-linked bug-fix plan are approved for the active follow-up. The broader sections
-below describe the completed prior milestone and are historical context, not
-authorization for additional changes.
+Only `src/graph/cytoscape/stylesheet.ts`, its focused tests, this contract, and
+the linked bug-fix plan are approved for the active follow-up. The broader
+sections below describe completed prior milestones and are historical context,
+not authorization for additional changes.
 
 ## Non-goals
 
@@ -227,6 +226,6 @@ Future sessions should read this contract,
 `ROADMAP.md` before changing investigation targets, Microsoft Graph endpoints,
 permissions, graph relationship semantics, or graph visualization behavior.
 The active implementation plan is
-`.github/carl/plans/node-icon-rendering-fix.md`.
-The focused icon-rendering follow-up is complete. Future work should create a
-new active contract.
+`.github/carl/plans/edge-colour-rendering-fix.md`.
+The focused edge-colour follow-up is complete. Future work should create a new
+active contract.

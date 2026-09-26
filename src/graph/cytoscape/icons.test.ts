@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { GraphNodeType } from '../model/types.ts';
 import { getNodeTypeIcon } from './icons.ts';
-import { cytoscapeStylesheet } from './stylesheet.ts';
+import { cytoscapeStylesheet, edgeTypeColors } from './stylesheet.ts';
 
 const allNodeTypes: GraphNodeType[] = [
   'user',
@@ -38,5 +38,16 @@ describe('node type icons', () => {
     );
 
     expect(highlightedEdgeIndex).toBeGreaterThan(genericEdgeIndex);
+  });
+
+  it('applies relationship colours after the generic edge style', () => {
+    const genericEdgeIndex = cytoscapeStylesheet.findIndex((rule) => rule.selector === 'edge');
+
+    for (const type of Object.keys(edgeTypeColors)) {
+      const relationshipStyleIndex = cytoscapeStylesheet.findIndex(
+        (rule) => rule.selector === `.edge-type-${type}`,
+      );
+      expect(relationshipStyleIndex).toBeGreaterThan(genericEdgeIndex);
+    }
   });
 });

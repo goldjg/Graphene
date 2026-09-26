@@ -89,34 +89,6 @@ export const cytoscapeStylesheet: StylesheetJsonBlock[] = [
     },
   },
   {
-    selector: '.edge-type-appRoleAssignment',
-    style: {
-      'line-color': getEdgeTypeColor('appRoleAssignment'),
-      'target-arrow-color': getEdgeTypeColor('appRoleAssignment'),
-    },
-  },
-  {
-    selector: '.edge-type-delegatedPermissionGrant',
-    style: {
-      'line-color': getEdgeTypeColor('delegatedPermissionGrant'),
-      'target-arrow-color': getEdgeTypeColor('delegatedPermissionGrant'),
-    },
-  },
-  {
-    selector: '.edge-type-accesses',
-    style: {
-      'line-color': getEdgeTypeColor('accesses'),
-      'target-arrow-color': getEdgeTypeColor('accesses'),
-    },
-  },
-  {
-    selector: '.edge-type-assignedRole',
-    style: {
-      'line-color': getEdgeTypeColor('assignedRole'),
-      'target-arrow-color': getEdgeTypeColor('assignedRole'),
-    },
-  },
-  {
     selector: 'node:selected',
     style: {
       'border-width': 4,
@@ -154,6 +126,34 @@ export const cytoscapeStylesheet: StylesheetJsonBlock[] = [
       'text-background-opacity': 0.86,
       'text-background-padding': '2px',
       'text-margin-y': -6,
+    },
+  },
+  {
+    selector: '.edge-type-appRoleAssignment',
+    style: {
+      'line-color': getEdgeTypeColor('appRoleAssignment'),
+      'target-arrow-color': getEdgeTypeColor('appRoleAssignment'),
+    },
+  },
+  {
+    selector: '.edge-type-delegatedPermissionGrant',
+    style: {
+      'line-color': getEdgeTypeColor('delegatedPermissionGrant'),
+      'target-arrow-color': getEdgeTypeColor('delegatedPermissionGrant'),
+    },
+  },
+  {
+    selector: '.edge-type-accesses',
+    style: {
+      'line-color': getEdgeTypeColor('accesses'),
+      'target-arrow-color': getEdgeTypeColor('accesses'),
+    },
+  },
+  {
+    selector: '.edge-type-assignedRole',
+    style: {
+      'line-color': getEdgeTypeColor('assignedRole'),
+      'target-arrow-color': getEdgeTypeColor('assignedRole'),
     },
   },
   {
