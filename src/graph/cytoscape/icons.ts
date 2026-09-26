@@ -43,6 +43,11 @@ const icons: Record<GraphNodeType, string> = {
       '<path d="M7.8 6.6h1.8M14.4 6.6h1.8M7.8 10.6h1.8M14.4 10.6h1.8M7.8 14.6h1.8M14.4 14.6h1.8" stroke="#0b1220" stroke-width="1.8" />' +
       '<rect x="9.8" y="17" width="4.4" height="3.6" fill="#0b1220" stroke="none" />',
   ),
+  device: toDataUri(
+    '<rect x="3.2" y="4.2" width="17.6" height="12.4" rx="1.8" fill="#ffffff" stroke="none" />' +
+      '<path d="M8 20h8M10 16.6v3.4M14 16.6v3.4" stroke="#ffffff" stroke-width="2" />' +
+      '<rect x="5.5" y="6.5" width="13" height="7.8" rx="0.8" fill="#0b1220" stroke="none" />',
+  ),
   // Filled rounded tag with cut-out code brackets (app registration = developer-owned definition).
   appRegistration: toDataUri(
     '<path d="M4.6 4.4a2 2 0 0 1 2-2h10.8a2 2 0 0 1 2 2v15.2a2 2 0 0 1-2 2H6.6a2 2 0 0 1-2-2Z" fill="#ffffff" stroke="none" />' +

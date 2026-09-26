@@ -10,7 +10,7 @@ privilege-escalation engine, attack-path product, or risk-scoring system.
 
 ## Current feature status
 
-Milestones 0 through 6 are implemented: cARL governance, Vite + React +
+Milestones 0 through 9 are implemented: cARL governance, Vite + React +
 TypeScript foundation, Netlify configuration, environment configuration,
 baseline documentation, MSAL multi-tenant authentication, Microsoft Graph
 `/me`, a normalized graph domain model, a Cytoscape investigation canvas with
@@ -23,7 +23,9 @@ query-time direct/inherited relationship toggle and loading/error/
 unauthenticated states), non-destructive, display-time filtering by object
 type, relationship type, and inherited/direct status, and a hardening pass
 covering security headers, dependency/security review, an accessibility
-pass, and production bundle code-splitting.
+pass, production bundle code-splitting, local path/search/summary analysis,
+versioned snapshot import/export and comparison, CSV evidence export,
+selected-item evidence copy, and bounded one-object expansion.
 
 Live investigations support these target types:
 
@@ -32,13 +34,16 @@ Live investigations support these target types:
 - app registrations by object ID or application (client) ID;
 - enterprise applications/service principals by object ID or application
   (client) ID; and
-- activated directory roles by object ID or role template ID.
+- activated directory roles by object ID or role template ID;
+- administrative units by object ID; and
+- devices by object ID or device ID.
 
 Graphene loads the supported first-order relationships for the selected target:
 direct/transitive memberships, group members and owners, user-owned directory
 objects, linked app registration/service-principal objects, directory-role
 members, incoming or outgoing app-role assignments, and OAuth2 delegated
-permission grants. App-role assignments and delegated grants are rendered as
+permission grants, administrative-unit members, and device registered
+owners/users. App-role assignments and delegated grants are rendered as
 explicit permission nodes connected to their resource enterprise applications;
 directory roles are connected to the authenticated tenant scope. Every
 relationship keeps its Microsoft Graph endpoint and source-object provenance.
@@ -46,10 +51,23 @@ relationship keeps its Microsoft Graph endpoint and source-object provenance.
 Every graph node renders as a Fluent/Entra portal-style icon badge: a
 colour-coded rounded tile with a distinct pictogram per object type (user,
 group, directory role, tenant scope, app registration, enterprise
-application, app role, delegated permission), so meaning is never encoded by
-colour alone. The Filters panel doubles as the graph's key/legend: each
+application, device, app role, delegated permission), so meaning is never
+encoded by colour alone. The Filters panel doubles as the graph's key/legend: each
 object-type filter shows the same icon badge rendered on the canvas, and a
 relationship key explains edge colour and direct/inherited line style.
+
+The loaded graph can be searched and focused locally, summarized by object and
+relationship type, and inspected for shortest or bounded simple paths with
+plain-language relationship explanations. Graphene can export/import a
+versioned normalized snapshot, compare a snapshot with the current graph,
+export relationship provenance as CSV, copy selected evidence, and open
+supported objects in the Entra portal. Snapshot and CSV files can contain
+sensitive tenant directory metadata and should be protected accordingly.
+
+Selecting a supported live directory object enables explicit expansion of that
+one object and its first-order relationships. Expansion remains user-initiated,
+uses the existing bounded pagination behavior, and never performs recursive
+whole-tenant traversal.
 
 See `ROADMAP.md` for full milestone detail, including known follow-up items
 (such as keyboard navigation of individual graph nodes/edges).

@@ -4,4 +4,6 @@ export interface GraphApplication {
   displayName?: string | null;
   description?: string | null;
   signInAudience?: string | null;
+  publisherDomain?: string | null;
+  disabledByMicrosoftStatus?: string | null;
 }

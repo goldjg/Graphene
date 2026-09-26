@@ -11,6 +11,8 @@ import type {
 import type { GraphEdge, GraphNode, InvestigationGraph } from '../../graph/model/types.ts';
 import {
   toApplicationNode,
+  toAdministrativeUnitNode,
+  toDeviceNode,
   toDirectoryObjectNode,
   toDirectoryRoleNode,
   toGroupNode,
@@ -48,6 +50,94 @@ export async function buildInvestigationGraph(
       return buildServicePrincipalAccessGraph(graphClient, normalizedTarget.identifier, signal);
     case 'directoryRole':
       return buildDirectoryRoleAccessGraph(graphClient, normalizedTarget.identifier, signal);
+    case 'administrativeUnit':
+      return buildAdministrativeUnitAccessGraph(graphClient, normalizedTarget.identifier, signal);
+    case 'device':
+      return buildDeviceAccessGraph(graphClient, normalizedTarget.identifier, signal);
+  }
+
+  async function buildAdministrativeUnitAccessGraph(
+    graphClient: GraphClient,
+    administrativeUnitId: string,
+    signal?: AbortSignal,
+  ): Promise<InvestigationGraph> {
+    const [unit, members] = await Promise.all([
+      graphClient.getAdministrativeUnit(administrativeUnitId, signal),
+      graphClient.getAdministrativeUnitMembers(administrativeUnitId, signal),
+    ]);
+    const graph = createAccumulator();
+    const unitNode = markInvestigationTarget(toAdministrativeUnitNode(unit));
+    addNode(graph, unitNode);
+
+    for (const member of members) {
+      const memberNode = toDirectoryObjectNode(member);
+      if (!memberNode) {
+        continue;
+      }
+      addNode(graph, memberNode);
+      addEdge(graph, {
+        id: `scopedTo:${memberNode.id}:${unitNode.id}`,
+        source: memberNode.id,
+        target: unitNode.id,
+        type: 'scopedTo',
+        inherited: false,
+        provenance: {
+          graphEndpoint: `/directory/administrativeUnits/${unitNode.id}/members`,
+          sourceObjectId: unitNode.id,
+          direct: true,
+          relatedObjectIds: [memberNode.id, unitNode.id],
+        },
+        metadata: { scopeType: 'administrativeUnit' },
+      });
+    }
+
+    return finish(graph);
+  }
+
+  async function buildDeviceAccessGraph(
+    graphClient: GraphClient,
+    identifier: string,
+    signal?: AbortSignal,
+  ): Promise<InvestigationGraph> {
+    const device = await graphClient.getDevice(identifier, signal);
+    const [owners, registeredUsers] = await Promise.all([
+      graphClient.getDeviceRegisteredOwners(device.id, signal),
+      graphClient.getDeviceRegisteredUsers(device.id, signal),
+    ]);
+    const graph = createAccumulator();
+    const deviceNode = markInvestigationTarget(toDeviceNode(device));
+    addNode(graph, deviceNode);
+
+    addOwnerRelationships(
+      graph,
+      deviceNode.id,
+      owners,
+      `/devices/${deviceNode.id}/registeredOwners`,
+    );
+
+    for (const registeredUser of registeredUsers) {
+      const userNode = toDirectoryObjectNode(registeredUser);
+      if (!userNode) {
+        continue;
+      }
+      addNode(graph, userNode);
+      addEdge(graph, {
+        id: `registeredTo:${userNode.id}:${deviceNode.id}`,
+        source: userNode.id,
+        target: deviceNode.id,
+        type: 'registeredTo',
+        inherited: false,
+        provenance: {
+          graphEndpoint: `/devices/${deviceNode.id}/registeredUsers`,
+          sourceObjectId: deviceNode.id,
+          direct: true,
+          relatedObjectIds: [userNode.id, deviceNode.id],
+        },
+        metadata: {},
+      });
+    }
+
+    return finish(graph);
   }
 }
 

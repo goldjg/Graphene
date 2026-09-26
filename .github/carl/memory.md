@@ -112,10 +112,12 @@ query-state parsing, and safe error handling as those features are introduced.
 ## Multi-object investigation baseline
 
 Live investigation targets are users, groups, app registrations, enterprise
-applications/service principals, and activated directory roles. Exact
+applications/service principals, activated directory roles, administrative
+units, and devices. Exact
 identifier forms are user object ID/UPN, group object ID, application object
 ID/application ID, service-principal object ID/application ID, and directory
-role object ID/role template ID.
+role object ID/role template ID, administrative-unit object ID, and device
+object ID/device ID.
 
 The `User.Read` plus `Directory.Read.All` delegated baseline is sufficient for
 the implemented Microsoft Graph v1.0 reads:
@@ -131,6 +133,8 @@ the implemented Microsoft Graph v1.0 reads:
 - OAuth2 delegated permission grants for the selected user or client service
   principal; and
 - organization scope for activated directory roles.
+- administrative-unit members; and
+- device registered owners and registered users.
 
 Relationship expansion is deliberately first-order rather than recursive
 whole-tenant traversal. App-role assignments and OAuth2 delegated grants are
@@ -140,6 +144,25 @@ visual organization aid only; it does not infer privilege from proximity.
 Hidden group membership still requires `Member.Read.Hidden` and is not queried.
 Microsoft Graph v1.0 omits service principals from `/groups/{id}/members`;
 Graphene does not use the beta endpoint workaround.
+
+## Local graph analysis and snapshots
+
+Graphene performs search/focus, summaries, path discovery/explanation, and
+snapshot comparison entirely over the normalized graph already loaded in the
+browser. Path enumeration is bounded to 10 results, depth 12, and 5,000
+generated path states and must not be described as proof of effective
+privilege.
+
+Normalized investigation snapshots use schema version 1 and preserve graph
+nodes, edges, metadata, and relationship provenance. Imports must validate the
+schema and graph references before replacing the loaded graph. Snapshot, CSV,
+and copied evidence outputs can contain sensitive tenant directory metadata
+but must never contain tokens or MSAL cache data.
+
+One-node expansion is an explicit user action for supported investigation
+targets. It loads only that object's existing first-order builder, strips the
+secondary target marker, and merges normalized nodes/edges by ID into the
+current graph; it is not recursive whole-tenant traversal.
 
 ## Node icon and legend presentation
 

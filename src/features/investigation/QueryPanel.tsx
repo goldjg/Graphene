@@ -29,6 +29,8 @@ const targetTypeLabels: Record<InvestigationTargetType, string> = {
   application: 'App registration',
   servicePrincipal: 'Enterprise application',
   directoryRole: 'Directory role',
+  administrativeUnit: 'Administrative unit',
+  device: 'Device',
 };
 
 const targetPlaceholders: Record<InvestigationTargetType, string> = {
@@ -37,6 +39,8 @@ const targetPlaceholders: Record<InvestigationTargetType, string> = {
   application: 'Application object ID or application (client) ID',
   servicePrincipal: 'Service principal object ID or application (client) ID',
   directoryRole: 'Role object ID or role template ID',
+  administrativeUnit: 'Administrative unit object ID',
+  device: 'Device object ID or device ID',
 };
 
 /**

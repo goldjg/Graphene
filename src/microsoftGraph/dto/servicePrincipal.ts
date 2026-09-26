@@ -25,6 +25,8 @@ export interface GraphServicePrincipal {
   servicePrincipalType?: string | null;
   accountEnabled?: boolean | null;
   appOwnerOrganizationId?: string | null;
+  preferredSingleSignOnMode?: string | null;
+  tags?: string[];
   appRoles?: GraphAppRoleDefinition[];
   oauth2PermissionScopes?: GraphPermissionScopeDefinition[];
 }

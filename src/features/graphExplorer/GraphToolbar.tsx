@@ -1,9 +1,11 @@
 import { graphLayoutLabels, type GraphLayoutId } from '../../graph/cytoscape/layouts.ts';
 import type { GraphCanvasHandle } from '../../graph/cytoscape/GraphCanvas.tsx';
 import type { InvestigationGraph } from '../../graph/model/types.ts';
+import { createSnapshot, graphToCsv } from '../../graph/analysis/snapshots.ts';
 
 interface GraphToolbarProps {
   graph: InvestigationGraph | null;
+  exportGraph: InvestigationGraph | null;
   layout: GraphLayoutId;
   onLayoutChange: (layout: GraphLayoutId) => void;
   onLoadDemo: () => void;
@@ -17,6 +19,7 @@ interface GraphToolbarProps {
  */
 export function GraphToolbar({
   graph,
+  exportGraph,
   layout,
   onLayoutChange,
   onLoadDemo,
@@ -43,8 +46,11 @@ export function GraphToolbar({
         <button type="button" onClick={() => canvasHandle?.zoomBy(1 / 1.2)} disabled={!graph}>
           Zoom out
         </button>
-        <button type="button" onClick={() => exportGraphJson(canvasHandle)} disabled={!graph}>
-          Export graph JSON
+        <button type="button" onClick={() => exportGraphSnapshot(exportGraph)} disabled={!graph}>
+          Export snapshot
+        </button>
+        <button type="button" onClick={() => exportGraphCsv(graph)} disabled={!graph}>
+          Export relationships CSV
         </button>
       </div>
 
@@ -69,17 +75,31 @@ export function GraphToolbar({
   );
 }
 
-function exportGraphJson(canvasHandle: GraphCanvasHandle | null) {
-  if (!canvasHandle) {
+function exportGraphSnapshot(graph: InvestigationGraph | null) {
+  if (!graph) {
     return;
   }
 
-  const elements = canvasHandle.exportElementsJson();
-  const blob = new Blob([JSON.stringify(elements, null, 2)], { type: 'application/json' });
+  downloadFile(
+    JSON.stringify(createSnapshot(graph), null, 2),
+    'application/json',
+    'graphene-investigation-snapshot.json',
+  );
+}
+
+function exportGraphCsv(graph: InvestigationGraph | null) {
+  if (!graph) {
+    return;
+  }
+  downloadFile(graphToCsv(graph), 'text/csv;charset=utf-8', 'graphene-relationships.csv');
+}
+
+function downloadFile(contents: string, type: string, fileName: string) {
+  const blob = new Blob([contents], { type });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
-  link.download = 'graphene-investigation-graph.json';
+  link.download = fileName;
   link.click();
   URL.revokeObjectURL(url);
 }

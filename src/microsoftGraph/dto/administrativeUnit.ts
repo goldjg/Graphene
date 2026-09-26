@@ -1,13 +1,10 @@
-export interface GraphGroup {
+export interface GraphAdministrativeUnit {
   id: string;
   displayName?: string | null;
   description?: string | null;
-  groupTypes?: string[];
-  mail?: string | null;
-  mailEnabled?: boolean | null;
-  securityEnabled?: boolean | null;
   visibility?: string | null;
-  isAssignableToRole?: boolean | null;
+  isMemberManagementRestricted?: boolean | null;
   membershipRule?: string | null;
+  membershipType?: string | null;
   membershipRuleProcessingState?: string | null;
 }

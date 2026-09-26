@@ -16,6 +16,7 @@ export const nodeTypeAppearance: Record<GraphNodeType, { color: string; borderCo
   directoryRole: { color: '#dc2626', borderColor: '#fca5a5' },
   tenantScope: { color: '#475569', borderColor: '#cbd5f5' },
   administrativeUnit: { color: '#0d9488', borderColor: '#5eead4' },
+  device: { color: '#0369a1', borderColor: '#7dd3fc' },
   appRegistration: { color: '#16a34a', borderColor: '#86efac' },
   enterpriseApplication: { color: '#15803d', borderColor: '#86efac' },
   appRole: { color: '#b45309', borderColor: '#fcd34d' },
@@ -123,6 +124,21 @@ export const cytoscapeStylesheet: StylesheetJsonBlock[] = [
     },
   },
   {
+    selector: '.analysis-dimmed',
+    style: {
+      opacity: 0.18,
+    },
+  },
+  {
+    selector: 'node.analysis-highlighted',
+    style: {
+      opacity: 1,
+      'border-color': '#facc15',
+      'border-width': 4,
+      'z-index': 10,
+    },
+  },
+  {
     selector: 'edge',
     style: {
       width: 2,
@@ -158,6 +174,16 @@ export const cytoscapeStylesheet: StylesheetJsonBlock[] = [
       'line-color': '#facc15',
       'target-arrow-color': '#facc15',
       width: 3,
+    },
+  },
+  {
+    selector: 'edge.analysis-highlighted',
+    style: {
+      opacity: 1,
+      'line-color': '#facc15',
+      'target-arrow-color': '#facc15',
+      width: 4,
+      'z-index': 10,
     },
   },
 ];

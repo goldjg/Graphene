@@ -18,6 +18,9 @@ export interface GraphCanvasHandle {
   zoomBy: (factor: number) => void;
   runLayout: (layoutId: GraphLayoutId) => void;
   exportElementsJson: () => unknown[];
+  focusNode: (nodeId: string) => void;
+  highlightElements: (elementIds: string[]) => void;
+  clearHighlights: () => void;
 }
 
 interface GraphCanvasProps {
@@ -124,6 +127,32 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(funct
         cyRef.current?.layout(getGraphLayoutOptions(layoutId, elements)).run();
       },
       exportElementsJson: () => cyRef.current?.elements().jsons() ?? [],
+      focusNode: (nodeId) => {
+        const cy = cyRef.current;
+        const node = cy?.getElementById(nodeId);
+        if (cy && node?.nonempty()) {
+          cy.elements().unselect();
+          node.select();
+          cy.center(node);
+        }
+      },
+      highlightElements: (elementIds) => {
+        const cy = cyRef.current;
+        if (!cy) {
+          return;
+        }
+        cy.elements().removeClass('analysis-dimmed analysis-highlighted');
+        if (elementIds.length === 0) {
+          return;
+        }
+        cy.elements().addClass('analysis-dimmed');
+        for (const id of elementIds) {
+          cy.getElementById(id).removeClass('analysis-dimmed').addClass('analysis-highlighted');
+        }
+      },
+      clearHighlights: () => {
+        cyRef.current?.elements().removeClass('analysis-dimmed analysis-highlighted');
+      },
     }),
     [elements],
   );

@@ -363,3 +363,85 @@ dd {
   margin: 0;
   color: #8fb7ff;
 }
+
+.analysis-panel {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid rgb(143 183 255 / 25%);
+  border-radius: 0.75rem;
+  background: rgb(15 23 42 / 72%);
+}
+
+.analysis-panel fieldset {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid rgb(143 183 255 / 25%);
+  border-radius: 0.5rem;
+}
+
+.analysis-panel legend {
+  padding: 0 0.35rem;
+  color: #8fb7ff;
+  font-weight: 700;
+}
+
+.analysis-panel label {
+  display: grid;
+  gap: 0.35rem;
+  color: #bfd0e7;
+}
+
+.analysis-panel input,
+.analysis-panel select {
+  min-width: 0;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid #8fb7ff;
+  border-radius: 0.5rem;
+  color: #ffffff;
+  background: #0f172a;
+}
+
+.analysis-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  color: #bfd0e7;
+}
+
+.analysis-message {
+  margin: 0;
+  color: #dbeafe;
+}
+
+.file-button {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  border: 1px solid #8fb7ff;
+  border-radius: 0.7rem;
+  padding: 0.7rem 1rem;
+  color: #ffffff;
+  background: rgb(37 99 235 / 75%);
+  cursor: pointer;
+}
+
+.file-button input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.details-panel a {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #8fb7ff;
+  border-radius: 0.7rem;
+  padding: 0.7rem 1rem;
+  color: #ffffff;
+  background: rgb(37 99 235 / 45%);
+  text-decoration: none;
+}

@@ -53,6 +53,8 @@ function decodeTargetType(value: string | null): InvestigationTargetType {
     case 'application':
     case 'servicePrincipal':
     case 'directoryRole':
+    case 'administrativeUnit':
+    case 'device':
       return value;
     default:
       return 'user';

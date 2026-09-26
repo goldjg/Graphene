@@ -285,4 +285,92 @@ describe('buildInvestigationGraph', () => {
       }),
     ).rejects.toThrow('valid Microsoft Entra object ID');
   });
+
+  it('builds administrative-unit membership with provenance', async () => {
+    const client = fakeGraphClient({
+      getAdministrativeUnit: () =>
+        Promise.resolve({
+          id: '11111111-2222-3333-4444-555555555555',
+          displayName: 'EMEA',
+          membershipType: 'Dynamic',
+        }),
+      getAdministrativeUnitMembers: () =>
+        Promise.resolve([
+          {
+            id: 'device-1',
+            displayName: 'Laptop',
+            '@odata.type': '#microsoft.graph.device',
+          },
+        ]),
+    });
+
+    const graph = await buildInvestigationGraph(client, {
+      type: 'administrativeUnit',
+      identifier: '11111111-2222-3333-4444-555555555555',
+    });
+
+    expect(graph.nodes).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ type: 'administrativeUnit', isInvestigationTarget: true }),
+        expect.objectContaining({ id: 'device-1', type: 'device' }),
+      ]),
+    );
+    expect(graph.edges[0]).toMatchObject({
+      source: 'device-1',
+      target: '11111111-2222-3333-4444-555555555555',
+      type: 'scopedTo',
+      provenance: {
+        graphEndpoint:
+          '/directory/administrativeUnits/11111111-2222-3333-4444-555555555555/members',
+        sourceObjectId: '11111111-2222-3333-4444-555555555555',
+      },
+    });
+  });
+
+  it('builds device registered-owner and registered-user relationships', async () => {
+    const client = fakeGraphClient({
+      getDevice: () =>
+        Promise.resolve({
+          id: 'device-object',
+          deviceId: '11111111-2222-3333-4444-555555555555',
+          displayName: 'Laptop',
+        }),
+      getDeviceRegisteredOwners: () =>
+        Promise.resolve([
+          {
+            id: 'owner-1',
+            displayName: 'Owner',
+            '@odata.type': '#microsoft.graph.user',
+          },
+        ]),
+      getDeviceRegisteredUsers: () =>
+        Promise.resolve([
+          {
+            id: 'user-1',
+            displayName: 'Registered user',
+            '@odata.type': '#microsoft.graph.user',
+          },
+        ]),
+    });
+
+    const graph = await buildInvestigationGraph(client, {
+      type: 'device',
+      identifier: '11111111-2222-3333-4444-555555555555',
+    });
+
+    expect(graph.edges).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          source: 'owner-1',
+          target: 'device-object',
+          type: 'owns',
+        }),
+        expect.objectContaining({
+          source: 'user-1',
+          target: 'device-object',
+          type: 'registeredTo',
+        }),
+      ]),
+    );
+  });
 });

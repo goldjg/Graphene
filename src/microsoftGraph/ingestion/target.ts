@@ -1,5 +1,11 @@
 export type InvestigationTargetType =
-  'user' | 'group' | 'application' | 'servicePrincipal' | 'directoryRole';
+  | 'user'
+  | 'group'
+  | 'application'
+  | 'servicePrincipal'
+  | 'directoryRole'
+  | 'administrativeUnit'
+  | 'device';
 
 export interface InvestigationTarget {
   type: InvestigationTargetType;

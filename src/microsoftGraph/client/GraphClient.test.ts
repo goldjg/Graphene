@@ -200,7 +200,7 @@ describe('GraphClient', () => {
       id: 'application-object',
     });
     expect(fetchImpl.mock.calls[1]?.[0]).toBe(
-      "https://graph.example.test/v1.0/applications(appId='client-id')",
+      "https://graph.example.test/v1.0/applications(appId='client-id')?$select=id,appId,displayName,description,signInAudience,publisherDomain,disabledByMicrosoftStatus",
     );
   });
 
@@ -226,6 +226,24 @@ describe('GraphClient', () => {
       'https://graph.example.test/v1.0/servicePrincipals/sp-1/appRoleAssignments',
       'https://graph.example.test/v1.0/servicePrincipals/sp-1/appRoleAssignedTo',
     ]);
+  });
+
+  it('requests the supported richer service-principal metadata', async () => {
+    const fetchImpl = vi.fn<typeof fetch>().mockResolvedValue(
+      new Response(JSON.stringify({ id: 'sp-1' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    );
+    const client = new GraphClient({
+      tokenProvider: () => Promise.resolve('access-token'),
+      baseUrl: 'https://graph.example.test/v1.0',
+      fetchImpl,
+    });
+
+    await client.getServicePrincipal('sp-1');
+
+    expect(fetchImpl.mock.calls[0]?.[0]).toContain('preferredSingleSignOnMode,tags');
   });
 
   it('fails explicitly instead of returning a silently truncated collection', async () => {
@@ -315,5 +333,31 @@ describe('GraphClient', () => {
     });
 
     await expect(client.getOrganization()).resolves.toMatchObject({ id: 'tenant-1' });
+  });
+
+  it('uses v1.0 administrative-unit and device relationship endpoints', async () => {
+    const fetchImpl = vi.fn<typeof fetch>().mockImplementation(() =>
+      Promise.resolve(
+        new Response(JSON.stringify({ value: [] }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      ),
+    );
+    const client = new GraphClient({
+      tokenProvider: () => Promise.resolve('access-token'),
+      baseUrl: 'https://graph.example.test/v1.0',
+      fetchImpl,
+    });
+
+    await client.getAdministrativeUnitMembers('au-1');
+    await client.getDeviceRegisteredOwners('device-1');
+    await client.getDeviceRegisteredUsers('device-1');
+
+    expect(fetchImpl.mock.calls.map(([url]) => url)).toEqual([
+      'https://graph.example.test/v1.0/directory/administrativeUnits/au-1/members',
+      'https://graph.example.test/v1.0/devices/device-1/registeredOwners',
+      'https://graph.example.test/v1.0/devices/device-1/registeredUsers',
+    ]);
   });
 });

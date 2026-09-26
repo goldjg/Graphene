@@ -6,6 +6,44 @@ import type { GraphSelection } from '../../graph/cytoscape/GraphCanvas.tsx';
 interface DetailsPanelProps {
   graph: InvestigationGraph;
   selection: GraphSelection | null;
+  canExpand?: boolean;
+  isExpanding?: boolean;
+  expansionMessage?: string | null;
+  onExpand?: () => void;
+}
+
+async function copyEvidence(
+  value: GraphNode | GraphEdge,
+  setMessage: (message: string) => void,
+): Promise<void> {
+  if (!navigator.clipboard) {
+    setMessage('Clipboard access is unavailable in this browser.');
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(JSON.stringify(value, null, 2));
+    setMessage('Evidence copied to the clipboard.');
+  } catch {
+    setMessage('The browser blocked clipboard access.');
+  }
+}
+
+function getEntraPortalUrl(node: GraphNode): string | null {
+  const id = encodeURIComponent(node.id);
+  switch (node.type) {
+    case 'user':
+      return `https://entra.microsoft.com/#view/Microsoft_AAD_UsersAndTenants/UserProfileMenuBlade/~/overview/userId/${id}`;
+    case 'group':
+      return `https://entra.microsoft.com/#view/Microsoft_AAD_IAM/GroupDetailsMenuBlade/~/Overview/groupId/${id}`;
+    case 'appRegistration':
+      return `https://entra.microsoft.com/#view/Microsoft_AAD_RegisteredApps/ApplicationMenuBlade/~/Overview/appId/${id}`;
+    case 'enterpriseApplication':
+      return `https://entra.microsoft.com/#view/Microsoft_AAD_IAM/ManagedAppMenuBlade/~/Overview/objectId/${id}`;
+    case 'device':
+      return `https://entra.microsoft.com/#view/Microsoft_AAD_Devices/DeviceDetailsMenuBlade/~/Properties/objectId/${id}`;
+    default:
+      return null;
+  }
 }
 
 /**
@@ -13,7 +51,14 @@ interface DetailsPanelProps {
  * provenance/metadata payload collapsed by default (per the brief's detail
  * panel requirement: readable summary first, debug data on demand).
  */
-export function DetailsPanel({ graph, selection }: DetailsPanelProps) {
+export function DetailsPanel({
+  graph,
+  selection,
+  canExpand = false,
+  isExpanding = false,
+  expansionMessage = null,
+  onExpand,
+}: DetailsPanelProps) {
   if (!selection) {
     return (
       <aside className="details-panel" aria-label="Selection details">
@@ -26,14 +71,35 @@ export function DetailsPanel({ graph, selection }: DetailsPanelProps) {
 
   if (selection.kind === 'node') {
     const node = graph.nodes.find((candidate) => candidate.id === selection.id);
-    return <NodeDetails node={node} />;
+    return (
+      <NodeDetails
+        node={node}
+        canExpand={canExpand}
+        isExpanding={isExpanding}
+        expansionMessage={expansionMessage}
+        onExpand={onExpand}
+      />
+    );
   }
 
   const edge = graph.edges.find((candidate) => candidate.id === selection.id);
   return <EdgeDetails edge={edge} />;
 }
 
-function NodeDetails({ node }: { node: GraphNode | undefined }) {
+function NodeDetails({
+  node,
+  canExpand,
+  isExpanding,
+  expansionMessage,
+  onExpand,
+}: {
+  node: GraphNode | undefined;
+  canExpand: boolean;
+  isExpanding: boolean;
+  expansionMessage: string | null;
+  onExpand: (() => void) | undefined;
+}) {
+  const [copyMessage, setCopyMessage] = useState<string | null>(null);
   if (!node) {
     return (
       <aside className="details-panel" aria-label="Selection details">
@@ -69,13 +135,36 @@ function NodeDetails({ node }: { node: GraphNode | undefined }) {
           </div>
         ) : null}
       </dl>
-      <MetadataDetails type={node.type} metadata={node.metadata} />
+      <MetadataDetails metadata={node.metadata} />
+      <div className="button-row">
+        <button type="button" onClick={() => void copyEvidence(node, setCopyMessage)}>
+          Copy evidence
+        </button>
+        {getEntraPortalUrl(node) ? (
+          <a href={getEntraPortalUrl(node) ?? undefined} target="_blank" rel="noopener noreferrer">
+            Open in Entra
+          </a>
+        ) : null}
+        {onExpand ? (
+          <button type="button" disabled={!canExpand || isExpanding} onClick={onExpand}>
+            {isExpanding ? 'Expanding...' : 'Expand selected object'}
+          </button>
+        ) : null}
+      </div>
+      {onExpand ? (
+        <p className="analysis-message">
+          Expansion loads one supported object and its bounded first-order relationships.
+        </p>
+      ) : null}
+      {copyMessage ? <p className="analysis-message">{copyMessage}</p> : null}
+      {expansionMessage ? <p className="analysis-message">{expansionMessage}</p> : null}
       <RawDataDisclosure data={node} />
     </aside>
   );
 }
 
 function EdgeDetails({ edge }: { edge: GraphEdge | undefined }) {
+  const [copyMessage, setCopyMessage] = useState<string | null>(null);
   if (!edge) {
     return (
       <aside className="details-panel" aria-label="Selection details">
@@ -117,7 +206,11 @@ function EdgeDetails({ edge }: { edge: GraphEdge | undefined }) {
           </div>
         ) : null}
       </dl>
-      <MetadataDetails type={edge.type} metadata={edge.metadata} />
+      <MetadataDetails metadata={edge.metadata} />
+      <button type="button" onClick={() => void copyEvidence(edge, setCopyMessage)}>
+        Copy evidence
+      </button>
+      {copyMessage ? <p className="analysis-message">{copyMessage}</p> : null}
       <RawDataDisclosure data={edge} />
     </aside>
   );
@@ -139,24 +232,37 @@ const metadataLabels: Record<string, string> = {
   scope: 'Scope',
   adminConsentDescription: 'Admin consent description',
   userConsentDescription: 'User consent description',
+  userPrincipalName: 'User principal name',
+  mail: 'Mail',
+  accountEnabled: 'Account enabled',
+  userType: 'User type',
+  groupTypes: 'Group types',
+  mailEnabled: 'Mail enabled',
+  securityEnabled: 'Security enabled',
+  visibility: 'Visibility',
+  isAssignableToRole: 'Role assignable',
+  membershipRule: 'Membership rule',
+  membershipRuleProcessingState: 'Membership rule processing',
+  signInAudience: 'Sign-in audience',
+  publisherDomain: 'Publisher domain',
+  disabledByMicrosoftStatus: 'Disabled by Microsoft',
+  servicePrincipalType: 'Service principal type',
+  appOwnerOrganizationId: 'Publisher tenant ID',
+  preferredSingleSignOnMode: 'Preferred single sign-on mode',
+  tags: 'Tags',
+  roleTemplateId: 'Role template ID',
+  isMemberManagementRestricted: 'Restricted management',
+  membershipType: 'Membership type',
+  deviceId: 'Device ID',
+  operatingSystem: 'Operating system',
+  operatingSystemVersion: 'Operating system version',
+  trustType: 'Join type',
+  isCompliant: 'Compliant',
+  isManaged: 'Managed',
+  approximateLastSignInDateTime: 'Approximate last sign-in',
 };
 
-function MetadataDetails({
-  type,
-  metadata,
-}: {
-  type: GraphNode['type'] | GraphEdge['type'];
-  metadata: Record<string, unknown>;
-}) {
-  if (
-    type !== 'appRole' &&
-    type !== 'delegatedPermission' &&
-    type !== 'appRoleAssignment' &&
-    type !== 'delegatedPermissionGrant'
-  ) {
-    return null;
-  }
-
+function MetadataDetails({ metadata }: { metadata: Record<string, unknown> }) {
   const entries = Object.entries(metadata).filter(
     ([key, value]) => metadataLabels[key] && value !== null && value !== undefined && value !== '',
   );

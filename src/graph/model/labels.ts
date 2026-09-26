@@ -6,6 +6,7 @@ export const nodeTypeLabels: Record<GraphNodeType, string> = {
   directoryRole: 'Directory role',
   tenantScope: 'Tenant scope',
   administrativeUnit: 'Administrative unit',
+  device: 'Device',
   appRegistration: 'App registration',
   enterpriseApplication: 'Enterprise application',
   appRole: 'App role',
@@ -22,4 +23,5 @@ export const edgeTypeLabels: Record<GraphEdgeType, string> = {
   delegatedPermissionGrant: 'Consented for',
   accesses: 'Accesses',
   assignedTo: 'Assigned to',
+  registeredTo: 'Registered user',
 };

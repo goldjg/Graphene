@@ -1,8 +1,10 @@
 import { GraphApiError } from './errors.ts';
 import type { GraphApplication } from '../dto/application.ts';
+import type { GraphAdministrativeUnit } from '../dto/administrativeUnit.ts';
 import type { GraphAppRoleAssignment } from '../dto/appRoleAssignment.ts';
 import type { GraphDirectoryRole } from '../dto/directoryRole.ts';
 import type { GraphDirectoryObject } from '../dto/directoryObject.ts';
+import type { GraphDevice } from '../dto/device.ts';
 import type { GraphGroup } from '../dto/group.ts';
 import type { GraphOAuth2PermissionGrant } from '../dto/oauth2PermissionGrant.ts';
 import type { GraphOrganization } from '../dto/organization.ts';
@@ -101,7 +103,7 @@ export class GraphClient {
 
   async getGroup(groupId: string, signal?: AbortSignal): Promise<GraphGroup> {
     return this.request<GraphGroup>(
-      `/groups/${encodeURIComponent(groupId)}`,
+      `/groups/${encodeURIComponent(groupId)}${groupSelect}`,
       signal ? { signal } : {},
     );
   }
@@ -163,6 +165,7 @@ export class GraphClient {
       'appId',
       identifier,
       signal,
+      applicationSelect,
     );
   }
 
@@ -171,7 +174,7 @@ export class GraphClient {
     signal?: AbortSignal,
   ): Promise<GraphApplication | null> {
     return this.requestOptional<GraphApplication>(
-      `/applications(appId='${escapeODataString(appId)}')`,
+      `/applications(appId='${escapeODataString(appId)}')${applicationSelect}`,
       signal,
     );
   }
@@ -262,6 +265,55 @@ export class GraphClient {
     return this.request<GraphDirectoryObject>(
       `/directoryObjects/${encodeURIComponent(objectId)}`,
       signal ? { signal } : {},
+    );
+  }
+
+  async getAdministrativeUnit(
+    administrativeUnitId: string,
+    signal?: AbortSignal,
+  ): Promise<GraphAdministrativeUnit> {
+    return this.request<GraphAdministrativeUnit>(
+      `/directory/administrativeUnits/${encodeURIComponent(administrativeUnitId)}`,
+      signal ? { signal } : {},
+    );
+  }
+
+  async getAdministrativeUnitMembers(
+    administrativeUnitId: string,
+    signal?: AbortSignal,
+  ): Promise<GraphDirectoryObject[]> {
+    return this.requestCollection<GraphDirectoryObject>(
+      `/directory/administrativeUnits/${encodeURIComponent(administrativeUnitId)}/members`,
+      signal,
+    );
+  }
+
+  async getDevice(identifier: string, signal?: AbortSignal): Promise<GraphDevice> {
+    return this.requestByObjectOrAlternateKey<GraphDevice>(
+      'devices',
+      'deviceId',
+      identifier,
+      signal,
+    );
+  }
+
+  async getDeviceRegisteredOwners(
+    deviceId: string,
+    signal?: AbortSignal,
+  ): Promise<GraphDirectoryObject[]> {
+    return this.requestCollection<GraphDirectoryObject>(
+      `/devices/${encodeURIComponent(deviceId)}/registeredOwners`,
+      signal,
+    );
+  }
+
+  async getDeviceRegisteredUsers(
+    deviceId: string,
+    signal?: AbortSignal,
+  ): Promise<GraphDirectoryObject[]> {
+    return this.requestCollection<GraphDirectoryObject>(
+      `/devices/${encodeURIComponent(deviceId)}/registeredUsers`,
+      signal,
     );
   }
 
@@ -412,7 +464,15 @@ function escapeODataString(value: string): string {
 
 const servicePrincipalSelect =
   '?$select=id,appId,displayName,description,servicePrincipalType,accountEnabled,' +
-  'appOwnerOrganizationId,appRoles,oauth2PermissionScopes';
+  'appOwnerOrganizationId,preferredSingleSignOnMode,tags,appRoles,oauth2PermissionScopes';
+
+const groupSelect =
+  '?$select=id,displayName,description,groupTypes,mail,mailEnabled,securityEnabled,visibility,' +
+  'isAssignableToRole,membershipRule,membershipRuleProcessingState';
+
+const applicationSelect =
+  '?$select=id,appId,displayName,description,signInAudience,publisherDomain,' +
+  'disabledByMicrosoftStatus';
 
 async function toGraphApiError(response: Response): Promise<GraphApiError> {
   const body = await readGraphErrorBody(response);

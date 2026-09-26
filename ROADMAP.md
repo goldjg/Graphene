@@ -144,3 +144,26 @@ fallback metadata. The visualization represents Graph-reported relationships
 only; layout proximity is not treated as evidence of access. The key/legend
 lives inside the Filters panel rather than as a separate floating overlay, so
 filtering an object type and reading its icon meaning happen in one place.
+
+## Milestone 9 — local analysis and directory expansion
+
+- Loaded-graph search and canvas focus
+- Shortest and bounded simple-path discovery with readable explanations
+- Investigation summaries by object type and direct/inherited relationship
+- Versioned normalized snapshot import/export and current-vs-snapshot diff
+- CSV provenance export, evidence copy, and Entra portal links
+- Administrative-unit targets and first-order members
+- Device targets with registered owners and registered users
+- Richer non-credential group, application, service-principal,
+  administrative-unit, and device metadata
+- Explicit one-selected-object expansion with normalized graph merging
+- No delegated permission expansion beyond `User.Read` and
+  `Directory.Read.All`
+
+Status: implemented. Local analysis never calls Microsoft Graph. Path
+enumeration is capped at 10 results, depth 12, and 5,000 generated path states.
+Snapshot imports are schema/version validated and replace the loaded graph only
+after successful validation. Live expansion is explicit, one object per user
+action, first-order only, and remains subject to the existing 50-page
+collection safety limit. Administrative-unit hidden membership remains
+unavailable without `Member.Read.Hidden`.

@@ -13,6 +13,7 @@ export type GraphNodeType =
   | 'directoryRole'
   | 'tenantScope'
   | 'administrativeUnit'
+  | 'device'
   | 'appRegistration'
   | 'enterpriseApplication'
   | 'appRole'
@@ -27,7 +28,8 @@ export type GraphEdgeType =
   | 'appRoleAssignment'
   | 'delegatedPermissionGrant'
   | 'accesses'
-  | 'assignedTo';
+  | 'assignedTo'
+  | 'registeredTo';
 
 export interface GraphNode {
   id: string;

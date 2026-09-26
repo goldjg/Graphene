@@ -1,9 +1,12 @@
 import type { GraphApplication } from '../dto/application.ts';
+import type { GraphAdministrativeUnit } from '../dto/administrativeUnit.ts';
+import type { GraphDevice } from '../dto/device.ts';
 import type { GraphDirectoryRole } from '../dto/directoryRole.ts';
 import {
   isGraphAdministrativeUnit,
   isGraphApplication,
   isGraphDirectoryRole,
+  isGraphDevice,
   isGraphGroup,
   isGraphServicePrincipal,
   isGraphUser,
@@ -42,6 +45,9 @@ export function toGroupNode(group: GraphGroup): GraphNode {
       mailEnabled: group.mailEnabled,
       securityEnabled: group.securityEnabled,
       visibility: group.visibility,
+      isAssignableToRole: group.isAssignableToRole,
+      membershipRule: group.membershipRule,
+      membershipRuleProcessingState: group.membershipRuleProcessingState,
     },
   };
 }
@@ -56,6 +62,8 @@ export function toApplicationNode(application: GraphApplication): GraphNode {
       appId: application.appId,
       description: application.description,
       signInAudience: application.signInAudience,
+      publisherDomain: application.publisherDomain,
+      disabledByMicrosoftStatus: application.disabledByMicrosoftStatus,
     },
   };
 }
@@ -71,6 +79,9 @@ export function toServicePrincipalNode(servicePrincipal: GraphServicePrincipal):
       description: servicePrincipal.description,
       servicePrincipalType: servicePrincipal.servicePrincipalType,
       accountEnabled: servicePrincipal.accountEnabled,
+      appOwnerOrganizationId: servicePrincipal.appOwnerOrganizationId,
+      preferredSingleSignOnMode: servicePrincipal.preferredSingleSignOnMode,
+      tags: servicePrincipal.tags,
     },
   };
 }
@@ -97,6 +108,41 @@ export function toTenantScopeNode(organization: GraphOrganization): GraphNode {
   };
 }
 
+export function toAdministrativeUnitNode(unit: GraphAdministrativeUnit): GraphNode {
+  return {
+    id: unit.id,
+    type: 'administrativeUnit',
+    label: unit.displayName ?? unit.id,
+    ...(unit.description ? { subtitle: unit.description } : {}),
+    metadata: {
+      visibility: unit.visibility,
+      isMemberManagementRestricted: unit.isMemberManagementRestricted,
+      membershipRule: unit.membershipRule,
+      membershipType: unit.membershipType,
+      membershipRuleProcessingState: unit.membershipRuleProcessingState,
+    },
+  };
+}
+
+export function toDeviceNode(device: GraphDevice): GraphNode {
+  return {
+    id: device.id,
+    type: 'device',
+    label: device.displayName ?? device.deviceId ?? device.id,
+    ...(device.operatingSystem ? { subtitle: device.operatingSystem } : {}),
+    metadata: {
+      deviceId: device.deviceId,
+      accountEnabled: device.accountEnabled,
+      operatingSystem: device.operatingSystem,
+      operatingSystemVersion: device.operatingSystemVersion,
+      trustType: device.trustType,
+      isCompliant: device.isCompliant,
+      isManaged: device.isManaged,
+      approximateLastSignInDateTime: device.approximateLastSignInDateTime,
+    },
+  };
+}
+
 export function toDirectoryObjectNode(directoryObject: GraphDirectoryObject): GraphNode | null {
   if (isGraphUser(directoryObject)) {
     return toUserNode(directoryObject);
@@ -119,13 +165,11 @@ export function toDirectoryObjectNode(directoryObject: GraphDirectoryObject): Gr
   }
 
   if (isGraphAdministrativeUnit(directoryObject)) {
-    return {
-      id: directoryObject.id,
-      type: 'administrativeUnit',
-      label: directoryObject.displayName ?? directoryObject.id,
-      ...(directoryObject.description ? { subtitle: directoryObject.description } : {}),
-      metadata: { visibility: directoryObject.visibility },
-    };
+    return toAdministrativeUnitNode(directoryObject);
+  }
+
+  if (isGraphDevice(directoryObject)) {
+    return toDeviceNode(directoryObject);
   }
 
   return null;

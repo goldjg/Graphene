@@ -50,6 +50,13 @@ a public issue with exploit details.
   `/groups/{id}/members` rather than broadening the API or permission boundary.
 - Bound collection pagination and fail explicitly rather than silently
   returning a partial graph when the safety limit is exceeded.
+- Treat exported normalized snapshots, relationship CSV files, and copied
+  evidence as sensitive tenant directory metadata. Exports must never include
+  access tokens, refresh tokens, MSAL cache data, or encryption material.
+- Validate snapshot schema, object types, relationship types, provenance, and
+  graph references before replacing the currently loaded graph.
+- Keep path analysis and snapshot comparison local to the browser; neither
+  operation may trigger Microsoft Graph requests.
 
 ## Trust flow
 

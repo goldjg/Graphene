@@ -22,6 +22,18 @@ export interface GraphDirectoryObject {
   mailEnabled?: boolean | null;
   securityEnabled?: boolean | null;
   visibility?: string | null;
+  isAssignableToRole?: boolean | null;
+  membershipRule?: string | null;
+  membershipRuleProcessingState?: string | null;
+  isMemberManagementRestricted?: boolean | null;
+  membershipType?: string | null;
+  deviceId?: string | null;
+  operatingSystem?: string | null;
+  operatingSystemVersion?: string | null;
+  trustType?: string | null;
+  isCompliant?: boolean | null;
+  isManaged?: boolean | null;
+  approximateLastSignInDateTime?: string | null;
   '@odata.type'?: string;
 }
 
@@ -47,4 +59,8 @@ export function isGraphApplication(directoryObject: GraphDirectoryObject): boole
 
 export function isGraphAdministrativeUnit(directoryObject: GraphDirectoryObject): boolean {
   return directoryObject['@odata.type'] === '#microsoft.graph.administrativeUnit';
+}
+
+export function isGraphDevice(directoryObject: GraphDirectoryObject): boolean {
+  return directoryObject['@odata.type'] === '#microsoft.graph.device';
 }

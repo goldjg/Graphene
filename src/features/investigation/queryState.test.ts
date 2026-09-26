@@ -52,8 +52,13 @@ describe('queryState', () => {
     expect([...params.keys()].sort()).toEqual(['inherited', 'mode', 'target', 'type']);
   });
 
-  it('falls back to user when the target type is malformed', () => {
-    expect(decodeQueryState(new URLSearchParams('mode=search&type=device&target=abc'))).toEqual({
+  it('supports device targets and falls back to user when the target type is malformed', () => {
+    expect(
+      decodeQueryState(
+        new URLSearchParams('mode=search&type=device&target=11111111-2222-3333-4444-555555555555'),
+      ),
+    ).toMatchObject({ targetType: 'device' });
+    expect(decodeQueryState(new URLSearchParams('mode=search&type=unknown&target=abc'))).toEqual({
       mode: 'search',
       targetType: 'user',
       targetId: 'abc',

@@ -2,13 +2,13 @@
 
 ## Goal
 
-Extend Graphene's live Microsoft Entra investigation workflow beyond users so
-an authenticated operator can investigate users, groups, app registrations,
-enterprise applications, and activated directory roles, render the supported
-related objects and permission grants with provenance, and present a readable
-target-rooted access-path view with object filters, a persistent legend, and
-permission-specific details without expanding the delegated Microsoft Graph
-permission baseline.
+Implement the approved graph-analysis and directory-expansion milestone:
+path finding and explanation, loaded-graph search/focus, investigation
+summaries, normalized snapshot import/export and comparison, richer evidence
+export/copy actions, administrative-unit and device investigations, richer
+safe metadata, and explicit one-node expansion. Do not add the separately
+excluded accessible table/tree view and do not expand the delegated Microsoft
+Graph permission baseline.
 
 ## Contract status
 
@@ -25,6 +25,10 @@ completed
 - Reading hidden group membership that requires `Member.Read.Hidden`.
 - Treating visual proximity as proof of effective privilege.
 - Introducing a graph-layout dependency.
+- Adding an accessible table/tree view in this milestone.
+- Recursive or automatic whole-tenant traversal.
+- Application credential or secret-material inspection.
+- Risk scoring or claims of effective privilege based on graph topology.
 
 ## Carry-forward rules
 
@@ -67,6 +71,16 @@ Graphene truths unless explicitly amended in a future cARL contract and ADR.
 - Fluent/Entra portal-style icon badges per object type (uniform tile shape,
   colour, and pictogram), merging the graph key/legend into the Filters
   panel rather than a floating canvas overlay.
+- Pure loaded-graph path finding, explanations, search/focus, summaries, and
+  snapshot comparisons.
+- Versioned normalized snapshot import/export, CSV relationship export, and
+  selected-item evidence copy.
+- Administrative-unit investigations and their first-order members.
+- Device investigations and their registered owners/users.
+- Safe richer group, application, service-principal, administrative-unit, and
+  device metadata that excludes credentials and secret material.
+- Explicit expansion of one selected supported node per user action, merging
+  normalized results into the existing graph.
 
 ## Intentional amendments
 
@@ -82,6 +96,8 @@ name is Graphene.
 - Microsoft Graph beta endpoints or endpoints whose documented delegated
   permissions do not include `Directory.Read.All`.
 - Graph write operations.
+- Conditional Access, audit/sign-in logs, PIM, authentication methods,
+  entitlement management, hidden membership, or application credential data.
 - Client secrets, certificates, access tokens, refresh tokens, tenant secrets,
   or production confidential identifiers in repository files.
 - A backend, Netlify Function, or persistent tenant Graph data.
@@ -143,6 +159,7 @@ name is Graphene.
 - `src/features/investigation/**`
 - `src/features/graphExplorer/**`
 - `src/graph/**`
+- `src/styles.css`
 
 ## Tests / validation
 
@@ -173,6 +190,16 @@ name is Graphene.
    and scope value available from Microsoft Graph.
 7. The access-path layout is deterministic, dependency-free, and preserves
    user control through the existing alternative layouts.
+8. Local analysis and snapshot comparison operate only on normalized loaded
+   data and do not issue Graph requests.
+9. Snapshot imports are schema/version validated and malformed files fail
+   explicitly without replacing the current graph.
+10. Administrative-unit and device edges preserve complete relationship
+    provenance.
+11. Expansion is user-initiated, limited to one selected supported node per
+    action, and merges without deleting existing graph data.
+12. Exports contain no token or MSAL cache data and clearly warn that directory
+    metadata may be sensitive.
 
 ## Stop conditions
 
@@ -181,6 +208,8 @@ permission, application permission, broader delegated scope, or an authority
 outside `organizations`.
 Stop if a desired relationship is available only through a beta endpoint or
 requires a delegated permission outside the approved baseline.
+Stop if device or administrative-unit relationship documentation no longer
+lists `Directory.Read.All` as an accepted delegated permission.
 
 ## Escalation triggers
 
@@ -194,3 +223,7 @@ Future sessions should read this contract,
 `.github/carl/plans/reference-access-paths.md`, `README.md`, `SECURITY.md`, and
 `ROADMAP.md` before changing investigation targets, Microsoft Graph endpoints,
 permissions, graph relationship semantics, or graph visualization behavior.
+The active implementation plan is
+`.github/carl/plans/graph-analysis-and-directory-expansion.md`.
+This milestone is complete. Future work should create a new active contract
+rather than treating this completed scope as ongoing authorization.
