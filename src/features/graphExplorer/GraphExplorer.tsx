@@ -22,7 +22,7 @@ import { GraphToolbar } from './GraphToolbar.tsx';
  */
 export function GraphExplorer() {
   const [graph, setGraph] = useState<InvestigationGraph | null>(null);
-  const [layout, setLayout] = useState<GraphLayoutId>('breadthfirst');
+  const [layout, setLayout] = useState<GraphLayoutId>('accessPath');
   const [selection, setSelection] = useState<GraphSelection | null>(null);
   const [canvasHandle, setCanvasHandle] = useState<GraphCanvasHandle | null>(null);
   const [filters, setFilters] = useState(defaultFilterState());
@@ -79,12 +79,14 @@ export function GraphExplorer() {
       {graph && <FilterPanel graph={graph} filters={filters} onChange={setFilters} />}
 
       <div className="graph-explorer-body">
-        <GraphCanvas
-          ref={setCanvasRef}
-          elements={elements}
-          layout={layout}
-          onSelectionChange={setSelection}
-        />
+        <div className="graph-stage">
+          <GraphCanvas
+            ref={setCanvasRef}
+            elements={elements}
+            layout={layout}
+            onSelectionChange={setSelection}
+          />
+        </div>
         <DetailsPanel graph={filteredGraph ?? { nodes: [], edges: [] }} selection={selection} />
       </div>
     </section>

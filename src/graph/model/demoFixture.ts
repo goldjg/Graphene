@@ -22,6 +22,7 @@ const demoNodes: GraphNode[] = [
     type: 'user',
     label: 'Ada Lovelace',
     subtitle: 'ada@contoso.example',
+    isInvestigationTarget: true,
     metadata: {
       userPrincipalName: 'ada@contoso.example',
       accountEnabled: true,

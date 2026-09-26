@@ -153,11 +153,13 @@ describe('GraphClient', () => {
   });
 
   it('addresses the signed-in user via /me rather than /users/me', async () => {
-    const fetchImpl = vi.fn<typeof fetch>().mockResolvedValue(
-      new Response(JSON.stringify({ value: [] }), {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      }),
+    const fetchImpl = vi.fn<typeof fetch>().mockImplementation(() =>
+      Promise.resolve(
+        new Response(JSON.stringify({ value: [] }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      ),
     );
     const client = new GraphClient({
       tokenProvider: () => Promise.resolve('access-token'),
@@ -171,5 +173,147 @@ describe('GraphClient', () => {
       'https://graph.example.test/v1.0/me/transitiveMemberOf',
       expect.anything(),
     );
+  });
+
+  it('falls back from an application object ID to the appId alternate key', async () => {
+    const fetchImpl = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ error: { message: 'Not found' } }), {
+          status: 404,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ id: 'application-object', appId: 'client-id' }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      );
+    const client = new GraphClient({
+      tokenProvider: () => Promise.resolve('access-token'),
+      baseUrl: 'https://graph.example.test/v1.0',
+      fetchImpl,
+    });
+
+    await expect(client.getApplication('client-id')).resolves.toMatchObject({
+      id: 'application-object',
+    });
+    expect(fetchImpl.mock.calls[1]?.[0]).toBe(
+      "https://graph.example.test/v1.0/applications(appId='client-id')",
+    );
+  });
+
+  it('uses the v1.0 service-principal app-role relationship endpoints', async () => {
+    const fetchImpl = vi.fn<typeof fetch>().mockImplementation(() =>
+      Promise.resolve(
+        new Response(JSON.stringify({ value: [] }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      ),
+    );
+    const client = new GraphClient({
+      tokenProvider: () => Promise.resolve('access-token'),
+      baseUrl: 'https://graph.example.test/v1.0',
+      fetchImpl,
+    });
+
+    await client.getServicePrincipalAppRoleAssignments('sp-1');
+    await client.getServicePrincipalAppRoleAssignedTo('sp-1');
+
+    expect(fetchImpl.mock.calls.map(([url]) => url)).toEqual([
+      'https://graph.example.test/v1.0/servicePrincipals/sp-1/appRoleAssignments',
+      'https://graph.example.test/v1.0/servicePrincipals/sp-1/appRoleAssignedTo',
+    ]);
+  });
+
+  it('fails explicitly instead of returning a silently truncated collection', async () => {
+    let page = 0;
+    const fetchImpl = vi.fn<typeof fetch>().mockImplementation(() => {
+      page += 1;
+      return Promise.resolve(
+        new Response(
+          JSON.stringify({
+            value: [],
+            '@odata.nextLink': `https://graph.example.test/v1.0/groups/group-1/members?page=${
+              page + 1
+            }`,
+          }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } },
+        ),
+      );
+    });
+    const client = new GraphClient({
+      tokenProvider: () => Promise.resolve('access-token'),
+      baseUrl: 'https://graph.example.test/v1.0',
+      fetchImpl,
+    });
+
+    await expect(client.getGroupMembers('group-1')).rejects.toThrow(
+      'exceeded the safe 50-page limit',
+    );
+    expect(fetchImpl).toHaveBeenCalledTimes(50);
+  });
+
+  it('requests complete user app-role assignments with advanced-query headers', async () => {
+    const fetchImpl = vi.fn<typeof fetch>().mockResolvedValue(
+      new Response(JSON.stringify({ value: [] }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    );
+    const client = new GraphClient({
+      tokenProvider: () => Promise.resolve('access-token'),
+      baseUrl: 'https://graph.example.test/v1.0',
+      fetchImpl,
+    });
+
+    await client.getUserAppRoleAssignments('me');
+
+    expect(fetchImpl).toHaveBeenCalledWith(
+      'https://graph.example.test/v1.0/me/appRoleAssignments?$count=true',
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          ConsistencyLevel: 'eventual',
+        }) as HeadersInit,
+      }),
+    );
+  });
+
+  it('filters delegated permission grants by client service principal ID', async () => {
+    const fetchImpl = vi.fn<typeof fetch>().mockResolvedValue(
+      new Response(JSON.stringify({ value: [] }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    );
+    const client = new GraphClient({
+      tokenProvider: () => Promise.resolve('access-token'),
+      baseUrl: 'https://graph.example.test/v1.0',
+      fetchImpl,
+    });
+
+    await client.getOAuth2PermissionGrantsByClient('client-sp-id');
+
+    expect(fetchImpl.mock.calls[0]?.[0]).toBe(
+      'https://graph.example.test/v1.0/oauth2PermissionGrants?%24filter=clientId+eq+%27client-sp-id%27',
+    );
+  });
+
+  it('returns the signed-in organization from the collection endpoint', async () => {
+    const fetchImpl = vi.fn<typeof fetch>().mockResolvedValue(
+      new Response(JSON.stringify({ value: [{ id: 'tenant-1', displayName: 'Example' }] }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    );
+    const client = new GraphClient({
+      tokenProvider: () => Promise.resolve('access-token'),
+      baseUrl: 'https://graph.example.test/v1.0',
+      fetchImpl,
+    });
+
+    await expect(client.getOrganization()).resolves.toMatchObject({ id: 'tenant-1' });
   });
 });

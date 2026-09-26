@@ -39,6 +39,17 @@ a public issue with exploit details.
   finished processing any OAuth response parameters.
 - Keep browser API calls receiver-safe; do not detach native `Window` methods
   such as `fetch`.
+- Restrict live multi-object investigation to Microsoft Graph v1.0 endpoints
+  whose documented delegated permissions include `Directory.Read.All`.
+- Model OAuth2 delegated grants and app-role assignments as read-only
+  permission nodes. Preserve Graph-provided grant, assignment, principal,
+  client, resource, consent-type, scope, and permission IDs without treating
+  those identifiers or visual proximity as proof of effective privilege.
+- Do not use beta endpoints to fill relationship gaps. In particular, accept
+  the documented v1.0 omission of service principals from
+  `/groups/{id}/members` rather than broadening the API or permission boundary.
+- Bound collection pagination and fail explicitly rather than silently
+  returning a partial graph when the safety limit is exceeded.
 
 ## Trust flow
 

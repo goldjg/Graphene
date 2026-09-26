@@ -69,6 +69,7 @@ function NodeDetails({ node }: { node: GraphNode | undefined }) {
           </div>
         ) : null}
       </dl>
+      <MetadataDetails type={node.type} metadata={node.metadata} />
       <RawDataDisclosure data={node} />
     </aside>
   );
@@ -116,9 +117,73 @@ function EdgeDetails({ edge }: { edge: GraphEdge | undefined }) {
           </div>
         ) : null}
       </dl>
+      <MetadataDetails type={edge.type} metadata={edge.metadata} />
       <RawDataDisclosure data={edge} />
     </aside>
   );
+}
+
+const metadataLabels: Record<string, string> = {
+  appRoleId: 'App role ID',
+  value: 'Permission value',
+  displayName: 'Display name',
+  description: 'Description',
+  allowedMemberTypes: 'Allowed member types',
+  resourceId: 'Resource service principal ID',
+  resourceDisplayName: 'Resource',
+  permissionGrantId: 'Permission grant ID',
+  permissionId: 'Permission ID',
+  clientId: 'Client service principal ID',
+  consentType: 'Consent type',
+  principalId: 'Principal ID',
+  scope: 'Scope',
+  adminConsentDescription: 'Admin consent description',
+  userConsentDescription: 'User consent description',
+};
+
+function MetadataDetails({
+  type,
+  metadata,
+}: {
+  type: GraphNode['type'] | GraphEdge['type'];
+  metadata: Record<string, unknown>;
+}) {
+  if (
+    type !== 'appRole' &&
+    type !== 'delegatedPermission' &&
+    type !== 'appRoleAssignment' &&
+    type !== 'delegatedPermissionGrant'
+  ) {
+    return null;
+  }
+
+  const entries = Object.entries(metadata).filter(
+    ([key, value]) => metadataLabels[key] && value !== null && value !== undefined && value !== '',
+  );
+  if (entries.length === 0) {
+    return null;
+  }
+
+  return (
+    <dl>
+      {entries.map(([key, value]) => (
+        <div key={key}>
+          <dt>{metadataLabels[key]}</dt>
+          <dd>{formatMetadataValue(value)}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+function formatMetadataValue(value: unknown): string {
+  if (Array.isArray(value)) {
+    return value.join(', ');
+  }
+  if (typeof value === 'boolean') {
+    return value ? 'Yes' : 'No';
+  }
+  return String(value);
 }
 
 function RawDataDisclosure({ data }: { data: unknown }) {

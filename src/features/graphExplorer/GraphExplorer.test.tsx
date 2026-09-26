@@ -58,6 +58,8 @@ describe('GraphExplorer', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Load demo data' }));
 
     expect(screen.getByText(/nodes, .* edges/)).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Filters & key' })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Access paths' })).toBeInTheDocument();
   });
 
   it('filters out a node type and its edges without affecting the underlying graph', () => {

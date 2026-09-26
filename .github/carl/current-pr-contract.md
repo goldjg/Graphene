@@ -2,24 +2,29 @@
 
 ## Goal
 
-Maintain Graphene as a static Vite + React + TypeScript SPA with safe
-multi-tenant Microsoft Entra authentication configuration, Netlify deployment,
-and baseline documentation using Graphene as the product name.
+Extend Graphene's live Microsoft Entra investigation workflow beyond users so
+an authenticated operator can investigate users, groups, app registrations,
+enterprise applications, and activated directory roles, render the supported
+related objects and permission grants with provenance, and present a readable
+target-rooted access-path view with object filters, a persistent legend, and
+permission-specific details without expanding the delegated Microsoft Graph
+permission baseline.
 
 ## Contract status
 
-active
+completed
 
 ## Non-goals
 
 - Replacing MSAL or changing the authorization-code-with-PKCE architecture.
-- Microsoft Graph API calls.
-- Cytoscape rendering.
-- Investigation query UX.
-- Filtering implementation.
 - Backend services, Netlify Functions, databases, client secrets,
   certificates, telemetry, write permissions, or Graph application
   permissions.
+- Adding delegated permissions beyond `User.Read` and `Directory.Read.All`.
+- Microsoft Graph beta endpoints.
+- Reading hidden group membership that requires `Member.Read.Hidden`.
+- Treating visual proximity as proof of effective privilege.
+- Introducing a graph-layout dependency.
 
 ## Carry-forward rules
 
@@ -40,6 +45,28 @@ Graphene truths unless explicitly amended in a future cARL contract and ADR.
   an ephemeral Netlify deploy-preview URL.
 - Unit tests for Milestone 0 configuration invariants.
 - Milestone 0 documentation.
+- Typed lookup by user, group, app registration, enterprise application, and
+  activated directory role.
+- Object-ID lookup for all supported object types, plus UPN for users and
+  application/client ID alternate-key lookup for app registrations and
+  enterprise applications.
+- Permission-compatible relationship ingestion for memberships, owners,
+  linked app registration/service-principal objects, and app-role assignments.
+- OAuth2 delegated permission grants, delegated permission definitions,
+  app-role definitions, related resource service principals, and tenant scope
+  where Microsoft Graph establishes the relationship.
+- Provenance-preserving normalized graph nodes and edges for every relationship
+  returned by the new ingestion paths.
+- Query-state and investigation UI updates for selecting the target object
+  type.
+- Non-destructive display filtering by the object types present in the loaded
+  graph.
+- A deterministic, target-rooted access-path layout, readable relationship
+  labels, a persistent legend, and permission/grant-specific selection details.
+- Focused tests and durable documentation updates for the new behavior.
+- Fluent/Entra portal-style icon badges per object type (uniform tile shape,
+  colour, and pictogram), merging the graph key/legend into the Filters
+  panel rather than a floating canvas overlay.
 
 ## Intentional amendments
 
@@ -52,6 +79,8 @@ name is Graphene.
   documentation headings.
 - Entra `common` or `consumers` authorities.
 - Graph scopes beyond `User.Read` and `Directory.Read.All`.
+- Microsoft Graph beta endpoints or endpoints whose documented delegated
+  permissions do not include `Directory.Read.All`.
 - Graph write operations.
 - Client secrets, certificates, access tokens, refresh tokens, tenant secrets,
   or production confidential identifiers in repository files.
@@ -108,6 +137,12 @@ name is Graphene.
 - `ROADMAP.md`
 - `netlify.toml`
 - `.env.example`
+- `src/microsoftGraph/client/**`
+- `src/microsoftGraph/dto/**`
+- `src/microsoftGraph/ingestion/**`
+- `src/features/investigation/**`
+- `src/features/graphExplorer/**`
+- `src/graph/**`
 
 ## Tests / validation
 
@@ -118,11 +153,34 @@ name is Graphene.
 - `carl map`
 - `carl status`
 
+## Contract assertions
+
+1. Authentication continues to request exactly `User.Read` and
+   `Directory.Read.All`; no new delegated or application permissions are
+   introduced.
+2. A query explicitly identifies its target object type and resolves only the
+   supported identifier forms for that type.
+3. Every rendered relationship is backed by a Microsoft Graph response and
+   retains endpoint, queried object ID, direct/transitive status, related
+   object IDs, and assignment ID when available.
+4. Object-type filters remain display-time, non-destructive transforms over
+   the loaded `InvestigationGraph` and never trigger Microsoft Graph requests.
+5. Unsupported, hidden, incomplete, or permission-constrained relationships
+   are skipped or reported explicitly; Graphene never invents relationships or
+   silently broadens permissions.
+6. App-role and delegated-permission nodes preserve the assignment/grant ID,
+   resource service principal, permission identifier, consent type, principal,
+   and scope value available from Microsoft Graph.
+7. The access-path layout is deterministic, dependency-free, and preserves
+   user control through the existing alternative layouts.
+
 ## Stop conditions
 
 Stop if authentication requires adding a backend, secret, Graph write
 permission, application permission, broader delegated scope, or an authority
 outside `organizations`.
+Stop if a desired relationship is available only through a beta endpoint or
+requires a delegated permission outside the approved baseline.
 
 ## Escalation triggers
 
@@ -131,8 +189,8 @@ backend code, or a design that changes the static SPA trust boundary.
 
 ## Context reset notes
 
-When Milestone 0 is committed, future sessions should read this contract,
-`.github/carl/plans/milestone-0-foundations.md`, `.github/carl/memory.md`,
-`README.md`, `SECURITY.md`, `ROADMAP.md`, and
-`docs/architecture/adr/0001-static-spa-foundation.md` before starting
-Milestone 1.
+Future sessions should read this contract,
+`.github/carl/plans/multi-object-investigation.md`, `.github/carl/memory.md`,
+`.github/carl/plans/reference-access-paths.md`, `README.md`, `SECURITY.md`, and
+`ROADMAP.md` before changing investigation targets, Microsoft Graph endpoints,
+permissions, graph relationship semantics, or graph visualization behavior.

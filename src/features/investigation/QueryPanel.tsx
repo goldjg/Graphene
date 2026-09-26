@@ -2,7 +2,11 @@ import { useEffect, useState, type FormEvent } from 'react';
 
 import { useAuth } from '../../auth/useAuth.ts';
 import { mapGraphError } from '../../microsoftGraph/client/errors.ts';
-import { buildUserAccessGraph } from '../../microsoftGraph/ingestion/buildUserAccessGraph.ts';
+import { buildInvestigationGraph } from '../../microsoftGraph/ingestion/buildInvestigationGraph.ts';
+import {
+  validateInvestigationTarget,
+  type InvestigationTargetType,
+} from '../../microsoftGraph/ingestion/target.ts';
 import type { InvestigationGraph } from '../../graph/model/types.ts';
 import {
   decodeQueryState,
@@ -18,6 +22,22 @@ interface QueryPanelProps {
 }
 
 type QueryStatus = 'idle' | 'loading' | 'error';
+
+const targetTypeLabels: Record<InvestigationTargetType, string> = {
+  user: 'User',
+  group: 'Group',
+  application: 'App registration',
+  servicePrincipal: 'Enterprise application',
+  directoryRole: 'Directory role',
+};
+
+const targetPlaceholders: Record<InvestigationTargetType, string> = {
+  user: 'user@tenant.example or object ID',
+  group: 'Group object ID',
+  application: 'Application object ID or application (client) ID',
+  servicePrincipal: 'Service principal object ID or application (client) ID',
+  directoryRole: 'Role object ID or role template ID',
+};
 
 /**
  * Investigation query panel: choose the current signed-in user or a
@@ -54,9 +74,15 @@ export function QueryPanel({ onResult, onReset }: QueryPanelProps) {
     event.preventDefault();
     setErrorMessage(null);
 
-    if (queryState.mode === 'search' && !queryState.targetId.trim()) {
-      setErrorMessage('Enter an object ID or user principal name to search for.');
-      return;
+    if (queryState.mode === 'search') {
+      const validationError = validateInvestigationTarget({
+        type: queryState.targetType,
+        identifier: queryState.targetId,
+      });
+      if (validationError) {
+        setErrorMessage(validationError);
+        return;
+      }
     }
 
     const graphClient = getGraphClient();
@@ -69,8 +95,10 @@ export function QueryPanel({ onResult, onReset }: QueryPanelProps) {
     setStatus('loading');
 
     try {
-      const targetId = queryState.mode === 'me' ? 'me' : queryState.targetId.trim();
-      const graph = await buildUserAccessGraph(graphClient, targetId);
+      const graph = await buildInvestigationGraph(graphClient, {
+        type: queryState.mode === 'me' ? 'user' : queryState.targetType,
+        identifier: queryState.mode === 'me' ? 'me' : queryState.targetId.trim(),
+      });
       const filtered = queryState.includeInherited
         ? graph
         : {
@@ -117,22 +145,42 @@ export function QueryPanel({ onResult, onReset }: QueryPanelProps) {
               checked={queryState.mode === 'search'}
               onChange={() => handleModeChange('search')}
             />
-            Search by object ID or user principal name
+            Search by object type and identifier
           </label>
         </div>
 
         {queryState.mode === 'search' ? (
-          <label className="query-target">
-            Target user
-            <input
-              type="text"
-              value={queryState.targetId}
-              placeholder="user@tenant.example or object ID"
-              onChange={(event) =>
-                setQueryState((current) => ({ ...current, targetId: event.target.value }))
-              }
-            />
-          </label>
+          <>
+            <label className="query-target">
+              Object type
+              <select
+                value={queryState.targetType}
+                onChange={(event) =>
+                  setQueryState((current) => ({
+                    ...current,
+                    targetType: event.target.value as InvestigationTargetType,
+                  }))
+                }
+              >
+                {Object.entries(targetTypeLabels).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="query-target">
+              Identifier
+              <input
+                type="text"
+                value={queryState.targetId}
+                placeholder={targetPlaceholders[queryState.targetType]}
+                onChange={(event) =>
+                  setQueryState((current) => ({ ...current, targetId: event.target.value }))
+                }
+              />
+            </label>
+          </>
         ) : null}
 
         <label className="query-toggle">

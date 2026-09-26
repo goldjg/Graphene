@@ -1,4 +1,5 @@
 <!-- version: 1.0.0 -->
+
 # Durable Architectural Truth Cache
 
 This cache stores durable Graphene project truths that should persist beyond a
@@ -108,9 +109,50 @@ should cover pagination, throttling, normalized graph generation, direct versus
 inherited relationships, deduplication, provenance preservation, filtering,
 query-state parsing, and safe error handling as those features are introduced.
 
-## Current unresolved Graph-permission uncertainties
+## Multi-object investigation baseline
 
-Future milestones must verify which role, administrative-unit, OAuth grant,
-application, service-principal, and app-role relationships are actually
-available with only `User.Read` and `Directory.Read.All`. Do not resolve those
-uncertainties by adding permissions during the initial implementation.
+Live investigation targets are users, groups, app registrations, enterprise
+applications/service principals, and activated directory roles. Exact
+identifier forms are user object ID/UPN, group object ID, application object
+ID/application ID, service-principal object ID/application ID, and directory
+role object ID/role template ID.
+
+The `User.Read` plus `Directory.Read.All` delegated baseline is sufficient for
+the implemented Microsoft Graph v1.0 reads:
+
+- user and group direct/transitive memberships;
+- group direct/transitive members and group owners;
+- user-owned directory objects;
+- user and group app-role assignments;
+- application and service-principal owners;
+- app registration to service-principal linkage by `appId`;
+- incoming and outgoing service-principal app-role assignments; and
+- activated directory-role members;
+- OAuth2 delegated permission grants for the selected user or client service
+  principal; and
+- organization scope for activated directory roles.
+
+Relationship expansion is deliberately first-order rather than recursive
+whole-tenant traversal. App-role assignments and OAuth2 delegated grants are
+modelled as explicit permission nodes connected to resource service principals.
+The default access-path layout is rooted at the investigation target and is a
+visual organization aid only; it does not infer privilege from proximity.
+Hidden group membership still requires `Member.Read.Hidden` and is not queried.
+Microsoft Graph v1.0 omits service principals from `/groups/{id}/members`;
+Graphene does not use the beta endpoint workaround.
+
+## Node icon and legend presentation
+
+Every graph node type renders as a uniform rounded-tile "badge" shape
+(`src/graph/cytoscape/stylesheet.ts`) with a colour-coded background and a
+distinct filled pictogram (`src/graph/cytoscape/icons.ts`), matching
+Microsoft Entra/Fluent-style portal icon badges rather than varying
+geometric shapes. Meaning must never rely on colour alone; the icon glyph is
+the primary type signal.
+
+The graph key/legend is not a separate floating overlay. It is merged into
+`FilterPanel` (`src/features/graphExplorer/FilterPanel.tsx`): each
+object-type filter checkbox shows the same icon badge rendered on the canvas,
+and a relationship key below the checkboxes explains edge colour
+(`getEdgeTypeColor` in `stylesheet.ts`) and direct/inherited line style. Do
+not reintroduce a separate floating canvas legend component.

@@ -1,4 +1,7 @@
 import type { GraphEdgeType, GraphNodeType, InvestigationGraph } from '../../graph/model/types.ts';
+import { edgeTypeLabels, nodeTypeLabels } from '../../graph/model/labels.ts';
+import { getNodeTypeIcon } from '../../graph/cytoscape/icons.ts';
+import { getEdgeTypeColor, nodeTypeAppearance } from '../../graph/cytoscape/stylesheet.ts';
 import {
   applyGraphFilters,
   distinctEdgeTypes,
@@ -6,30 +9,6 @@ import {
   isFilterActive,
   type GraphFilterState,
 } from '../../graph/filters/graphFilters.ts';
-
-const nodeTypeLabels: Record<GraphNodeType, string> = {
-  user: 'Users',
-  group: 'Groups',
-  directoryRole: 'Directory roles',
-  tenantScope: 'Tenant scopes',
-  administrativeUnit: 'Administrative units',
-  appRegistration: 'App registrations',
-  enterpriseApplication: 'Enterprise applications',
-  appRole: 'App roles',
-  delegatedPermission: 'Delegated permissions',
-};
-
-const edgeTypeLabels: Record<GraphEdgeType, string> = {
-  memberOf: 'Member of',
-  transitiveMemberOf: 'Transitive member of',
-  assignedRole: 'Assigned role',
-  owns: 'Owns',
-  scopedTo: 'Scoped to',
-  appRoleAssignment: 'App role assignment',
-  delegatedPermissionGrant: 'Delegated permission grant',
-  accesses: 'Accesses',
-  assignedTo: 'Assigned to',
-};
 
 interface FilterPanelProps {
   graph: InvestigationGraph;
@@ -41,6 +20,10 @@ interface FilterPanelProps {
  * Non-destructive, display-time filtering controls over an already-loaded
  * graph. Every toggle here only changes what is rendered; it never triggers
  * a new Microsoft Graph query and never mutates the loaded graph data.
+ *
+ * This panel doubles as the graph's key/legend: every object-type filter
+ * shows the same icon badge rendered on the canvas, and the relationship
+ * key at the bottom explains edge colour and direct/inherited line style.
  */
 export function FilterPanel({ graph, filters, onChange }: FilterPanelProps) {
   const nodeTypes = distinctNodeTypes(graph);
@@ -80,7 +63,7 @@ export function FilterPanel({ graph, filters, onChange }: FilterPanelProps) {
 
   return (
     <section className="filter-panel" aria-labelledby="filter-panel-heading">
-      <h3 id="filter-panel-heading">Filters</h3>
+      <h3 id="filter-panel-heading">Filters &amp; key</h3>
       <p className="filter-status" role="status">
         {active
           ? `Filters active: ${hiddenNodeCount} of ${graph.nodes.length} nodes hidden, ` +
@@ -97,7 +80,16 @@ export function FilterPanel({ graph, filters, onChange }: FilterPanelProps) {
               checked={!filters.hiddenNodeTypes.has(type)}
               onChange={() => toggleNodeType(type)}
             />
-            {nodeTypeLabels[type]}
+            <span
+              className="filter-icon-badge"
+              style={{
+                backgroundColor: nodeTypeAppearance[type].color,
+                borderColor: nodeTypeAppearance[type].borderColor,
+                backgroundImage: `url("${getNodeTypeIcon(type)}")`,
+              }}
+              aria-hidden="true"
+            />
+            {nodeTypeLabels[type]}s
           </label>
         ))}
       </fieldset>
@@ -111,6 +103,11 @@ export function FilterPanel({ graph, filters, onChange }: FilterPanelProps) {
               checked={!filters.hiddenEdgeTypes.has(type)}
               onChange={() => toggleEdgeType(type)}
             />
+            <i
+              className="filter-edge-swatch"
+              style={{ borderTopColor: getEdgeTypeColor(type) }}
+              aria-hidden="true"
+            />
             {edgeTypeLabels[type]}
           </label>
         ))}
@@ -120,6 +117,17 @@ export function FilterPanel({ graph, filters, onChange }: FilterPanelProps) {
         <input type="checkbox" checked={filters.hideInherited} onChange={toggleHideInherited} />
         Hide inherited (transitive) relationships
       </label>
+
+      <div className="filter-key-lines">
+        <span>
+          <i className="legend-line legend-line-direct" aria-hidden="true" />
+          Direct relationship
+        </span>
+        <span>
+          <i className="legend-line legend-line-inherited" aria-hidden="true" />
+          Inherited through a group
+        </span>
+      </div>
 
       <button type="button" onClick={resetFilters} disabled={!active}>
         Reset filters

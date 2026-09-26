@@ -1,19 +1,32 @@
 /**
  * Common shape returned by `/memberOf` and `/transitiveMemberOf` collections.
  *
- * Microsoft Graph returns a heterogeneous collection discriminated by
- * `@odata.type`. Only `#microsoft.graph.group` and
- * `#microsoft.graph.directoryRole` are modelled today because those are the
- * relationship kinds confirmed available under the `User.Read` plus
- * `Directory.Read.All` delegated permission baseline. Any other
- * `@odata.type` is treated as unsupported and skipped rather than guessed at
- * (see `.github/carl/memory.md` unresolved permission uncertainties).
+ * Microsoft Graph returns heterogeneous relationship collections
+ * discriminated by `@odata.type`. The normalizer maps only explicitly
+ * supported directory object types and skips unknown types rather than
+ * guessing.
  */
 export interface GraphDirectoryObject {
   id: string;
   displayName?: string | null;
   description?: string | null;
+  userPrincipalName?: string | null;
+  mail?: string | null;
+  accountEnabled?: boolean | null;
+  userType?: string | null;
+  appId?: string | null;
+  signInAudience?: string | null;
+  servicePrincipalType?: string | null;
+  roleTemplateId?: string | null;
+  groupTypes?: string[];
+  mailEnabled?: boolean | null;
+  securityEnabled?: boolean | null;
+  visibility?: string | null;
   '@odata.type'?: string;
+}
+
+export function isGraphUser(directoryObject: GraphDirectoryObject): boolean {
+  return directoryObject['@odata.type'] === '#microsoft.graph.user';
 }
 
 export function isGraphGroup(directoryObject: GraphDirectoryObject): boolean {
@@ -22,4 +35,16 @@ export function isGraphGroup(directoryObject: GraphDirectoryObject): boolean {
 
 export function isGraphDirectoryRole(directoryObject: GraphDirectoryObject): boolean {
   return directoryObject['@odata.type'] === '#microsoft.graph.directoryRole';
+}
+
+export function isGraphServicePrincipal(directoryObject: GraphDirectoryObject): boolean {
+  return directoryObject['@odata.type'] === '#microsoft.graph.servicePrincipal';
+}
+
+export function isGraphApplication(directoryObject: GraphDirectoryObject): boolean {
+  return directoryObject['@odata.type'] === '#microsoft.graph.application';
+}
+
+export function isGraphAdministrativeUnit(directoryObject: GraphDirectoryObject): boolean {
+  return directoryObject['@odata.type'] === '#microsoft.graph.administrativeUnit';
 }

@@ -1,7 +1,7 @@
 import cytoscape from 'cytoscape';
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 
-import { graphLayoutOptions, type GraphLayoutId } from './layouts.ts';
+import { getGraphLayoutOptions, type GraphLayoutId } from './layouts.ts';
 import { cytoscapeStylesheet } from './stylesheet.ts';
 
 type Core = cytoscape.Core;
@@ -93,7 +93,7 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(funct
 
     cy.elements().remove();
     cy.add(elements);
-    cy.layout(graphLayoutOptions[initialLayoutRef.current]).run();
+    cy.layout(getGraphLayoutOptions(initialLayoutRef.current, elements)).run();
     cy.fit(undefined, 40);
   }, [elements]);
 
@@ -105,8 +105,8 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(funct
       return;
     }
 
-    cy.layout(graphLayoutOptions[layout]).run();
-  }, [layout]);
+    cy.layout(getGraphLayoutOptions(layout, elements)).run();
+  }, [elements, layout]);
 
   useImperativeHandle(
     ref,
@@ -121,11 +121,11 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(funct
         }
       },
       runLayout: (layoutId) => {
-        cyRef.current?.layout(graphLayoutOptions[layoutId]).run();
+        cyRef.current?.layout(getGraphLayoutOptions(layoutId, elements)).run();
       },
       exportElementsJson: () => cyRef.current?.elements().jsons() ?? [],
     }),
-    [],
+    [elements],
   );
 
   return (

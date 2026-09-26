@@ -35,6 +35,7 @@ export interface GraphNode {
   label: string;
   subtitle?: string;
   sourceId?: string;
+  isInvestigationTarget?: boolean;
   metadata: Record<string, unknown>;
 }
 

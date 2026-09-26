@@ -41,11 +41,11 @@ Status: implemented.
 - Supported relationships available under the initial permission baseline
 - Provenance metadata
 
-Status: implemented. Only `/me` (or `/users/{id}`), `/memberOf`, and
-`/transitiveMemberOf` are wired today; administrative units, app role
-assignments, delegated permission grants, and
-application/service-principal relationships remain unresolved and are not
-modelled yet (see `.github/carl/memory.md`).
+Status: implemented. Ingestion now covers the supported first-order user,
+group, application, service-principal, activated directory-role, app-role
+assignment, OAuth2 delegated permission grant, and organization relationships
+under the initial delegated permission baseline. Administrative units and
+recursive whole-tenant traversal remain unresolved.
 
 ## Milestone 4 — investigation UI
 
@@ -106,3 +106,41 @@ Status: implemented.
 - Dependency review: the dependency set remains minimal (React, MSAL
   Browser, Cytoscape, and their existing dev tooling); no new runtime
   dependencies were added for hardening.
+
+## Milestone 7 — multi-object investigation
+
+- Typed live investigation targets for users, groups, app registrations,
+  enterprise applications/service principals, and activated directory roles
+- Type-appropriate exact identifiers: user UPN/object ID, directory object ID,
+  application/client ID, and role template ID
+- Group members, owners, parent memberships, and app-role assignments,
+  including direct/transitive status where applicable
+- User-owned directory objects and user app-role assignments
+- Application and service-principal owners and linkage
+- Incoming and outgoing service-principal app-role assignments
+- Directory-role members
+- Existing non-destructive object-type filters applied to all live result types
+- No delegated permission expansion beyond `User.Read` and
+  `Directory.Read.All`
+
+Status: implemented. Relationship expansion is intentionally bounded to
+Microsoft Graph v1.0 endpoints documented for the existing permission
+baseline. Hidden group membership, beta-only workarounds, and recursive
+whole-tenant traversal remain out of scope.
+
+## Milestone 8 — reference access-path visualization
+
+- Explicit delegated-permission and app-role nodes
+- Resource enterprise applications and tenant scope
+- Target-rooted deterministic access-path layout
+- Fluent/Entra portal-style icon badges per object type, merged into the
+  Filters panel as the graph's key/legend
+- Readable node and relationship labels
+- Permission-specific grant and assignment details
+
+Status: implemented. Permission IDs are resolved against resource
+service-principal definitions when available and retain their raw Graph IDs as
+fallback metadata. The visualization represents Graph-reported relationships
+only; layout proximity is not treated as evidence of access. The key/legend
+lives inside the Filters panel rather than as a separate floating overlay, so
+filtering an object type and reading its icon meaning happen in one place.

@@ -1,5 +1,6 @@
 import cytoscape from 'cytoscape';
 
+import { edgeTypeLabels } from '../model/labels.ts';
 import type { GraphEdge, GraphNode, InvestigationGraph } from '../model/types.ts';
 
 type ElementDefinition = cytoscape.ElementDefinition;
@@ -23,6 +24,7 @@ function toNodeElement(node: GraphNode): ElementDefinition {
       label: node.label,
       subtitle: node.subtitle,
       sourceId: node.sourceId,
+      isInvestigationTarget: node.isInvestigationTarget ?? false,
     },
     classes: `node-type-${node.type}`,
   };
@@ -36,6 +38,7 @@ function toEdgeElement(edge: GraphEdge): ElementDefinition {
       source: edge.source,
       target: edge.target,
       graphEdgeType: edge.type,
+      label: edgeTypeLabels[edge.type],
       inherited: edge.inherited,
     },
     classes: [`edge-type-${edge.type}`, edge.inherited ? 'edge-inherited' : 'edge-direct'].join(

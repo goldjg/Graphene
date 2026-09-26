@@ -14,15 +14,42 @@ Milestones 0 through 6 are implemented: cARL governance, Vite + React +
 TypeScript foundation, Netlify configuration, environment configuration,
 baseline documentation, MSAL multi-tenant authentication, Microsoft Graph
 `/me`, a normalized graph domain model, a Cytoscape investigation canvas with
-demo fixture data, node/edge details panels, Microsoft Graph ingestion of
-a user's direct and transitive group/directory-role memberships (with
-pagination, throttling handling, and provenance metadata), a live
+demo fixture data, a target-rooted access-path layout, persistent visual key,
+readable node/relationship labels, structured permission details, Microsoft
+Graph ingestion of a user's direct and transitive group/directory-role
+memberships (with pagination, throttling handling, and provenance metadata), a live
 investigation query panel (current user or search by object ID/UPN, with a
 query-time direct/inherited relationship toggle and loading/error/
 unauthenticated states), non-destructive, display-time filtering by object
 type, relationship type, and inherited/direct status, and a hardening pass
 covering security headers, dependency/security review, an accessibility
 pass, and production bundle code-splitting.
+
+Live investigations support these target types:
+
+- users by object ID or user principal name;
+- groups by object ID;
+- app registrations by object ID or application (client) ID;
+- enterprise applications/service principals by object ID or application
+  (client) ID; and
+- activated directory roles by object ID or role template ID.
+
+Graphene loads the supported first-order relationships for the selected target:
+direct/transitive memberships, group members and owners, user-owned directory
+objects, linked app registration/service-principal objects, directory-role
+members, incoming or outgoing app-role assignments, and OAuth2 delegated
+permission grants. App-role assignments and delegated grants are rendered as
+explicit permission nodes connected to their resource enterprise applications;
+directory roles are connected to the authenticated tenant scope. Every
+relationship keeps its Microsoft Graph endpoint and source-object provenance.
+
+Every graph node renders as a Fluent/Entra portal-style icon badge: a
+colour-coded rounded tile with a distinct pictogram per object type (user,
+group, directory role, tenant scope, app registration, enterprise
+application, app role, delegated permission), so meaning is never encoded by
+colour alone. The Filters panel doubles as the graph's key/legend: each
+object-type filter shows the same icon badge rendered on the canvas, and a
+relationship key explains edge colour and direct/inherited line style.
 
 See `ROADMAP.md` for full milestone detail, including known follow-up items
 (such as keyboard navigation of individual graph nodes/edges).
@@ -195,6 +222,14 @@ The initial permission baseline is exactly:
 If a future Microsoft Graph endpoint requires additional permissions, Graphene
 must report that capability as unavailable under the current baseline rather
 than silently requesting broader access.
+
+The current multi-object investigation uses Microsoft Graph v1.0 endpoints
+whose documented delegated permissions include `Directory.Read.All`. It does
+not use beta endpoints, hidden group membership, or recursive expansion beyond
+the relationships listed above. It reads applicable OAuth2 delegated permission
+grants and app-role assignments without requesting additional scopes. Microsoft
+Graph v1.0 has a documented limitation where `/groups/{id}/members` omits
+service-principal members; Graphene does not switch to beta to work around it.
 
 ## Roadmap
 
