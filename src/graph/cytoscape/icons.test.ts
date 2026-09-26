@@ -17,11 +17,15 @@ const allNodeTypes: GraphNodeType[] = [
 ];
 
 describe('node type icons', () => {
-  it('provides a distinct SVG data URI icon for every GraphNodeType', () => {
+  it('provides a distinct, intrinsically sized base64 SVG for every GraphNodeType', () => {
     const icons = allNodeTypes.map(getNodeTypeIcon);
 
     for (const icon of icons) {
-      expect(icon.startsWith('data:image/svg+xml;utf8,')).toBe(true);
+      expect(icon.startsWith('data:image/svg+xml;base64,')).toBe(true);
+      const svg = atob(icon.slice('data:image/svg+xml;base64,'.length));
+      expect(svg).toContain('width="24"');
+      expect(svg).toContain('height="24"');
+      expect(svg).toContain('viewBox="0 0 24 24"');
     }
 
     expect(new Set(icons).size).toBe(allNodeTypes.length);

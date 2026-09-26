@@ -2,17 +2,20 @@
 
 ## Goal
 
-Implement the approved graph-analysis and directory-expansion milestone:
-path finding and explanation, loaded-graph search/focus, investigation
-summaries, normalized snapshot import/export and comparison, richer evidence
-export/copy actions, administrative-unit and device investigations, richer
-safe metadata, and explicit one-node expansion. Do not add the separately
-excluded accessible table/tree view and do not expand the delegated Microsoft
-Graph permission baseline.
+Fix the node-type SVG badges so they render inside Cytoscape's canvas,
+including mobile Safari, without changing icon semantics, graph behavior,
+dependencies, endpoints, or Microsoft Graph permissions.
 
 ## Contract status
 
 completed
+
+## Active follow-up scope
+
+Only `src/graph/cytoscape/icons.ts`, its focused tests, this contract, and the
+linked bug-fix plan are approved for the active follow-up. The broader sections
+below describe the completed prior milestone and are historical context, not
+authorization for additional changes.
 
 ## Non-goals
 
@@ -224,6 +227,6 @@ Future sessions should read this contract,
 `ROADMAP.md` before changing investigation targets, Microsoft Graph endpoints,
 permissions, graph relationship semantics, or graph visualization behavior.
 The active implementation plan is
-`.github/carl/plans/graph-analysis-and-directory-expansion.md`.
-This milestone is complete. Future work should create a new active contract
-rather than treating this completed scope as ongoing authorization.
+`.github/carl/plans/node-icon-rendering-fix.md`.
+The focused icon-rendering follow-up is complete. Future work should create a
+new active contract.
