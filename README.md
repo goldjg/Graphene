@@ -22,9 +22,9 @@ demo fixture data, a target-rooted access-path layout, persistent visual key,
 readable node/relationship labels, structured permission details, Microsoft
 Graph ingestion of a user's direct and transitive group/directory-role
 memberships (with pagination, throttling handling, and provenance metadata), a live
-investigation query panel (current user or search by object ID/UPN, with a
-query-time direct/inherited relationship toggle and loading/error/
-unauthenticated states), non-destructive, display-time filtering by object
+investigation query panel (current user or debounced typeahead search by
+display name/identifier, with a query-time direct/inherited relationship
+toggle and loading/error/unauthenticated states), non-destructive, display-time filtering by object
 type, relationship type, and inherited/direct status, and a hardening pass
 covering security headers, dependency/security review, an accessibility
 pass, production bundle code-splitting, local path/search/summary analysis,
@@ -41,6 +41,13 @@ Live investigations support these target types:
 - activated directory roles by object ID or role template ID;
 - administrative units by object ID; and
 - devices by object ID or device ID.
+
+The live query panel provides keyboard-accessible Microsoft Graph typeahead for
+the selected object type. It waits briefly while the user types, requires at
+least two characters, aborts stale requests, and returns at most eight matches.
+Selecting a match writes its exact object ID into the existing investigation
+query. Search uses eventual consistency, so newly changed directory objects
+can take time to appear.
 
 Graphene loads the supported first-order relationships for the selected target:
 direct/transitive memberships, group members and owners, user-owned directory

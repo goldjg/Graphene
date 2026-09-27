@@ -417,6 +417,73 @@ dd {
   color: #bfd0e7;
 }
 
+.object-suggestions {
+  display: grid;
+  gap: 0.4rem;
+  padding: 0.5rem;
+  border: 1px solid rgb(143 183 255 / 25%);
+  border-radius: 0.75rem;
+  background: rgb(9 17 31 / 82%);
+}
+
+.object-suggestion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid rgb(143 183 255 / 12%);
+  border-radius: 0.55rem;
+  background: rgb(12 24 39 / 82%);
+  color: #dce5f2;
+  text-align: left;
+  cursor: pointer;
+}
+
+.object-suggestion:hover,
+.object-suggestion:focus-visible,
+.object-suggestion-active {
+  border-color: #8fb7ff;
+  background: rgb(30 64 175 / 18%);
+}
+
+.object-suggestion-copy {
+  display: grid;
+  min-width: 0;
+}
+
+.object-suggestion-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.object-suggestion-detail,
+.object-suggestion-status,
+.object-suggestion-error {
+  margin: 0;
+  color: #bfd0e7;
+  font-size: 0.85rem;
+}
+
+.object-suggestion-detail {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.object-suggestion-error {
+  color: #fecaca;
+}
+
+.object-suggestion-meta {
+  color: #8fb7ff;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
 .analysis-message {
   margin: 0;
   color: #dbeafe;

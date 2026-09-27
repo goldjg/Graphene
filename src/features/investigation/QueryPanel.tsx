@@ -1,10 +1,11 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useId, useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
 
 import { useAuth } from '../../auth/useAuth.ts';
 import { mapGraphError } from '../../microsoftGraph/client/errors.ts';
 import { buildInvestigationGraph } from '../../microsoftGraph/ingestion/buildInvestigationGraph.ts';
 import {
   validateInvestigationTarget,
+  type InvestigationTargetSuggestion,
   type InvestigationTargetType,
 } from '../../microsoftGraph/ingestion/target.ts';
 import type { InvestigationGraph } from '../../graph/model/types.ts';
@@ -22,6 +23,9 @@ interface QueryPanelProps {
 }
 
 type QueryStatus = 'idle' | 'loading' | 'error';
+type SuggestionStatus = 'idle' | 'loading' | 'error';
+
+const TYPEAHEAD_DEBOUNCE_MS = 250;
 
 const targetTypeLabels: Record<InvestigationTargetType, string> = {
   user: 'User',
@@ -59,6 +63,13 @@ export function QueryPanel({ onResult, onReset }: QueryPanelProps) {
   );
   const [status, setStatus] = useState<QueryStatus>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [suggestions, setSuggestions] = useState<InvestigationTargetSuggestion[]>([]);
+  const [suggestionStatus, setSuggestionStatus] = useState<SuggestionStatus>('idle');
+  const [suggestionError, setSuggestionError] = useState<string | null>(null);
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
+  const searchSequenceRef = useRef(0);
+  const suppressSearchValueRef = useRef<string | null>(null);
+  const suggestionListId = useId();
 
   useEffect(() => {
     if (typeof window === 'undefined' || authStatus === 'initializing') {
@@ -70,8 +81,125 @@ export function QueryPanel({ onResult, onReset }: QueryPanelProps) {
     window.history.replaceState(null, '', url);
   }, [authStatus, queryState]);
 
+  useEffect(() => {
+    if (queryState.mode !== 'search' || authStatus !== 'authenticated') {
+      setSuggestions([]);
+      setSuggestionStatus('idle');
+      setSuggestionError(null);
+      setActiveSuggestionIndex(-1);
+      return;
+    }
+
+    const trimmed = queryState.targetId.trim();
+    if (suppressSearchValueRef.current === trimmed) {
+      suppressSearchValueRef.current = null;
+      setSuggestions([]);
+      setSuggestionStatus('idle');
+      setSuggestionError(null);
+      setActiveSuggestionIndex(-1);
+      return;
+    }
+
+    if (trimmed.length < 2) {
+      setSuggestions([]);
+      setSuggestionStatus('idle');
+      setSuggestionError(null);
+      setActiveSuggestionIndex(-1);
+      return;
+    }
+
+    const controller = new AbortController();
+    const sequence = ++searchSequenceRef.current;
+    setSuggestions([]);
+    setSuggestionStatus('idle');
+    setSuggestionError(null);
+    setActiveSuggestionIndex(-1);
+
+    const debounce = window.setTimeout(() => {
+      void (async () => {
+        setSuggestionStatus('loading');
+        try {
+          const graphClient = getGraphClient();
+          if (!graphClient) {
+            setSuggestionStatus('error');
+            setSuggestionError('Sign in to search Microsoft Entra objects.');
+            return;
+          }
+
+          const nextSuggestions = await graphClient.searchObjects(
+            queryState.targetType,
+            trimmed,
+            controller.signal,
+          );
+          if (controller.signal.aborted || sequence !== searchSequenceRef.current) {
+            return;
+          }
+
+          setSuggestions(nextSuggestions);
+          setSuggestionStatus('idle');
+        } catch (error) {
+          if (!controller.signal.aborted && sequence === searchSequenceRef.current) {
+            setSuggestions([]);
+            setSuggestionStatus('error');
+            setSuggestionError(
+              `${mapGraphError(error).message} You can still enter an exact identifier.`,
+            );
+          }
+        }
+      })();
+    }, TYPEAHEAD_DEBOUNCE_MS);
+
+    return () => {
+      controller.abort();
+      window.clearTimeout(debounce);
+    };
+  }, [authStatus, getGraphClient, queryState.mode, queryState.targetId, queryState.targetType]);
+
   const handleModeChange = (mode: InvestigationMode) => {
     setQueryState((current) => ({ ...current, mode }));
+  };
+
+  const selectSuggestion = (suggestion: InvestigationTargetSuggestion) => {
+    suppressSearchValueRef.current = suggestion.id;
+    setQueryState((current) => ({ ...current, targetId: suggestion.id }));
+    setSuggestions([]);
+    setSuggestionStatus('idle');
+    setSuggestionError(null);
+    setActiveSuggestionIndex(-1);
+  };
+
+  const handleSuggestionKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Escape') {
+      setSuggestions([]);
+      setSuggestionStatus('idle');
+      setSuggestionError(null);
+      setActiveSuggestionIndex(-1);
+      return;
+    }
+
+    if (!suggestions.length) {
+      return;
+    }
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      setActiveSuggestionIndex((current) => (current + 1) % suggestions.length);
+      return;
+    }
+
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      setActiveSuggestionIndex((current) => (current <= 0 ? suggestions.length - 1 : current - 1));
+      return;
+    }
+
+    if (event.key === 'Enter' && activeSuggestionIndex >= 0) {
+      event.preventDefault();
+      const suggestion = suggestions[activeSuggestionIndex];
+      if (suggestion) {
+        selectSuggestion(suggestion);
+      }
+    }
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -182,8 +310,55 @@ export function QueryPanel({ onResult, onReset }: QueryPanelProps) {
                 onChange={(event) =>
                   setQueryState((current) => ({ ...current, targetId: event.target.value }))
                 }
+                role="combobox"
+                aria-autocomplete="list"
+                aria-expanded={suggestions.length > 0}
+                aria-controls={suggestionListId}
+                aria-activedescendant={
+                  activeSuggestionIndex >= 0
+                    ? `${suggestionListId}-${activeSuggestionIndex}`
+                    : undefined
+                }
+                onKeyDown={handleSuggestionKeyDown}
               />
             </label>
+            {suggestionStatus === 'loading' ? (
+              <p className="object-suggestion-status" role="status">
+                Searching Microsoft Entra...
+              </p>
+            ) : null}
+            {suggestionError ? (
+              <p className="object-suggestion-error" role="status">
+                {suggestionError}
+              </p>
+            ) : null}
+            {suggestions.length > 0 ? (
+              <div className="object-suggestions" id={suggestionListId} role="listbox">
+                {suggestions.map((suggestion, index) => (
+                  <button
+                    key={`${suggestion.type}:${suggestion.id}`}
+                    id={`${suggestionListId}-${index}`}
+                    type="button"
+                    className={`object-suggestion${
+                      index === activeSuggestionIndex ? ' object-suggestion-active' : ''
+                    }`}
+                    role="option"
+                    aria-selected={index === activeSuggestionIndex}
+                    tabIndex={-1}
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={() => selectSuggestion(suggestion)}
+                  >
+                    <span className="object-suggestion-copy">
+                      <span className="object-suggestion-label">{suggestion.label}</span>
+                      <span className="object-suggestion-detail">{suggestion.detail}</span>
+                    </span>
+                    <span className="object-suggestion-meta">
+                      {targetTypeLabels[suggestion.type]}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            ) : null}
           </>
         ) : null}
 

@@ -10,6 +10,10 @@ import type { GraphOAuth2PermissionGrant } from '../dto/oauth2PermissionGrant.ts
 import type { GraphOrganization } from '../dto/organization.ts';
 import type { GraphServicePrincipal } from '../dto/servicePrincipal.ts';
 import type { GraphUser } from '../dto/user.ts';
+import type {
+  InvestigationTargetSuggestion,
+  InvestigationTargetType,
+} from '../ingestion/target.ts';
 
 interface GraphClientOptions {
   tokenProvider: () => Promise<string>;
@@ -32,6 +36,7 @@ interface GraphCollectionResponse<T> {
 /** Upper bound on pages fetched per collection so a misbehaving tenant or
  * mock cannot cause an unbounded ingestion loop. */
 const MAX_COLLECTION_PAGES = 50;
+const MAX_OBJECT_SEARCH_RESULTS = 8;
 
 export class GraphClient {
   private readonly baseUrl: string;
@@ -342,6 +347,43 @@ export class GraphClient {
     return organization;
   }
 
+  async searchObjects(
+    type: InvestigationTargetType,
+    query: string,
+    signal?: AbortSignal,
+  ): Promise<InvestigationTargetSuggestion[]> {
+    const trimmed = query.trim();
+    if (trimmed.length < 2) {
+      return [];
+    }
+
+    const definition = objectSearchDefinitions[type];
+    const params = new URLSearchParams({
+      $search: definition.fields
+        .map((field) => `"${field}:${escapeSearchString(trimmed)}"`)
+        .join(' OR '),
+      $select: definition.select.join(','),
+      $top: String(MAX_OBJECT_SEARCH_RESULTS),
+    });
+    const response = await this.request<GraphCollectionResponse<GraphDirectoryObject>>(
+      `${definition.path}?${params.toString()}`,
+      {
+        ...(signal ? { signal } : {}),
+        headers: { ConsistencyLevel: 'eventual' },
+      },
+    );
+
+    return response.value.slice(0, MAX_OBJECT_SEARCH_RESULTS).map((item) => {
+      const detail = getObjectSearchDetail(type, item);
+      return {
+        id: item.id,
+        label: item.displayName?.trim() || detail || item.id,
+        detail: detail || item.id,
+        type,
+      };
+    });
+  }
+
   /** Microsoft Graph only supports the `/me` alias at the root; any other
    * user must be addressed as `/users/{id}`. */
   private userPath(userId: string): string {
@@ -461,6 +503,72 @@ export class GraphClient {
 function escapeODataString(value: string): string {
   return value.replaceAll("'", "''");
 }
+
+function escapeSearchString(value: string): string {
+  return value.replaceAll('\\', '\\\\').replaceAll('"', '\\"');
+}
+
+function getObjectSearchDetail(type: InvestigationTargetType, item: GraphDirectoryObject): string {
+  switch (type) {
+    case 'user':
+      return item.userPrincipalName?.trim() || item.mail?.trim() || item.id;
+    case 'group':
+      return item.mail?.trim() || item.id;
+    case 'application':
+    case 'servicePrincipal':
+      return item.appId?.trim() || item.id;
+    case 'directoryRole':
+      return item.roleTemplateId?.trim() || item.id;
+    case 'device':
+      return item.deviceId?.trim() || item.id;
+    case 'administrativeUnit':
+      return item.id;
+  }
+}
+
+interface ObjectSearchDefinition {
+  path: string;
+  fields: readonly string[];
+  select: readonly string[];
+}
+
+const objectSearchDefinitions: Record<InvestigationTargetType, ObjectSearchDefinition> = {
+  user: {
+    path: '/users',
+    fields: ['displayName', 'userPrincipalName', 'mail'],
+    select: ['id', 'displayName', 'userPrincipalName', 'mail'],
+  },
+  group: {
+    path: '/groups',
+    fields: ['displayName', 'mail'],
+    select: ['id', 'displayName', 'mail'],
+  },
+  application: {
+    path: '/applications',
+    fields: ['displayName', 'appId'],
+    select: ['id', 'displayName', 'appId'],
+  },
+  servicePrincipal: {
+    path: '/servicePrincipals',
+    fields: ['displayName', 'appId'],
+    select: ['id', 'displayName', 'appId'],
+  },
+  directoryRole: {
+    path: '/directoryRoles',
+    fields: ['displayName', 'roleTemplateId'],
+    select: ['id', 'displayName', 'roleTemplateId'],
+  },
+  administrativeUnit: {
+    path: '/directory/administrativeUnits',
+    fields: ['displayName'],
+    select: ['id', 'displayName'],
+  },
+  device: {
+    path: '/devices',
+    fields: ['displayName', 'deviceId'],
+    select: ['id', 'displayName', 'deviceId'],
+  },
+};
 
 const servicePrincipalSelect =
   '?$select=id,appId,displayName,description,servicePrincipalType,accountEnabled,' +

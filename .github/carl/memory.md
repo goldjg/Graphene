@@ -160,6 +160,13 @@ Hidden group membership still requires `Member.Read.Hidden` and is not queried.
 Microsoft Graph v1.0 omits service principals from `/groups/{id}/members`;
 Graphene does not use the beta endpoint workaround.
 
+The live investigation field provides debounced Microsoft Graph typeahead for
+the currently selected target type. It issues one bounded v1.0 advanced-search
+request after at least two characters, returns at most eight suggestions,
+aborts stale requests, and writes the selected object's exact ID into the
+investigation query. Search is eventually consistent; it does not query all
+object types at once, use a worker, or require JSON batching.
+
 ## Local graph analysis and snapshots
 
 Graphene performs search/focus, summaries, path discovery/explanation, and

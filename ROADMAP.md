@@ -56,9 +56,11 @@ recursive whole-tenant traversal remain unresolved.
 - Empty, loading, and error states
 
 Status: implemented. The query panel supports investigating the signed-in
-user or an explicit object ID/UPN, with a query-time include-inherited
-toggle, URL query-state sync (no secrets/tokens are ever encoded), and
-loading/error/unauthenticated states.
+user or an explicit object ID/UPN. The object field also provides a debounced,
+keyboard-accessible Microsoft Graph typeahead for the selected target type,
+with cancellation of stale requests and an eight-result cap. The panel retains
+its query-time include-inherited toggle, URL query-state sync (no secrets/tokens
+are ever encoded), and loading/error/unauthenticated states.
 
 ## Milestone 5 — filtering
 

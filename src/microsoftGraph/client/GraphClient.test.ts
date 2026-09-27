@@ -175,6 +175,79 @@ describe('GraphClient', () => {
     );
   });
 
+  it('searches the selected object type with one bounded advanced query', async () => {
+    const fetchImpl = vi.fn<typeof fetch>().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          value: [
+            {
+              id: 'group-1',
+              displayName: 'Engineering Team',
+              mail: 'engineering@example.test',
+            },
+          ],
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } },
+      ),
+    );
+    const client = new GraphClient({
+      tokenProvider: () => Promise.resolve('access-token'),
+      baseUrl: 'https://graph.example.test/v1.0',
+      fetchImpl,
+    });
+
+    await expect(client.searchObjects('group', 'engin')).resolves.toEqual([
+      {
+        id: 'group-1',
+        label: 'Engineering Team',
+        detail: 'engineering@example.test',
+        type: 'group',
+      },
+    ]);
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+
+    const [requestUrl, requestInit] = fetchImpl.mock.calls[0] ?? [];
+    expect(typeof requestUrl).toBe('string');
+    const url = new URL(requestUrl as string);
+    expect(url.pathname).toBe('/v1.0/groups');
+    expect(url.searchParams.get('$search')).toBe('"displayName:engin" OR "mail:engin"');
+    expect(url.searchParams.get('$select')).toBe('id,displayName,mail');
+    expect(url.searchParams.get('$top')).toBe('8');
+    expect(requestInit).toEqual(
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          ConsistencyLevel: 'eventual',
+        }) as HeadersInit,
+      }),
+    );
+  });
+
+  it('does not request suggestions for short queries and caps returned results', async () => {
+    const fetchImpl = vi.fn<typeof fetch>().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          value: Array.from({ length: 10 }, (_, index) => ({
+            id: `user-${index}`,
+            displayName: `User ${index}`,
+            userPrincipalName: `user${index}@example.test`,
+          })),
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } },
+      ),
+    );
+    const client = new GraphClient({
+      tokenProvider: () => Promise.resolve('access-token'),
+      baseUrl: 'https://graph.example.test/v1.0',
+      fetchImpl,
+    });
+
+    await expect(client.searchObjects('user', 'a')).resolves.toEqual([]);
+    expect(fetchImpl).not.toHaveBeenCalled();
+
+    await expect(client.searchObjects('user', 'user')).resolves.toHaveLength(8);
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+  });
+
   it('falls back from an application object ID to the appId alternate key', async () => {
     const fetchImpl = vi
       .fn<typeof fetch>()
