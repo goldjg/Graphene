@@ -2,6 +2,7 @@ import { AuthProvider } from './auth/AuthProvider.tsx';
 import { useAuth } from './auth/useAuth.ts';
 import { getAppConfig } from './config/environment.ts';
 import { GraphExplorer } from './features/graphExplorer/GraphExplorer.tsx';
+import { ThemeToggle } from './theme/ThemeToggle.tsx';
 
 export function App() {
   const configResult = readConfig();
@@ -24,6 +25,7 @@ export function App() {
           resources. Authentication uses Graphene's multi-tenant public SPA registration and the
           approved User.Read plus Directory.Read.All delegated permission baseline.
         </p>
+        <ThemeToggle />
       </section>
 
       <section className="status-card" aria-labelledby="auth-status">

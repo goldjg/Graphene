@@ -217,3 +217,44 @@ Component tests that mock `useAuth` must return a stable, hoisted context
 value. `QueryPanel`'s typeahead effect depends on `getGraphClient` identity,
 so a mock returning a fresh object per render causes an infinite effect/render
 loop that exhausts the Node heap instead of failing a test.
+
+## Theming
+
+Graphene supports a dark and a light theme. `src/theme/` owns the preference
+model, mirroring the `AuthContext` / `AuthProvider` / `useAuth` module shape:
+
+- `theme.ts` holds the `ThemePreference` (`system` | `light` | `dark`) and
+  `ResolvedTheme` (`light` | `dark`) types plus pure, storage-injectable
+  helpers;
+- `ThemeProvider` resolves `system` through `matchMedia` and writes
+  `data-theme` on `<html>` **only** when the user has overridden the system
+  preference;
+- `useTheme` deliberately does not throw outside a provider. Theme is
+  presentation, not a safety property, so `ThemeContext` has a usable default.
+
+`src/styles.css` declares every colour once as
+`light-dark(<light>, <dark>)` on semantic custom properties, with
+`color-scheme` deciding which side applies. Do not reintroduce literal colours
+into component styles, and do not duplicate a second light-theme token block:
+`light-dark()` exists precisely to avoid that drift.
+
+The system default must stay resolvable in CSS alone. `netlify.toml` sets
+`script-src self`, so the usual pre-paint inline theme script is
+unavailable; a CSS-resolved default is what prevents a flash of the wrong
+theme without weakening the Content-Security-Policy.
+
+Cytoscape styles are JavaScript values and cannot read CSS custom properties,
+so `createCytoscapeStylesheet(theme)` rebuilds the canvas stylesheet per
+resolved theme and `GraphCanvas` re-applies it on change. Node type tile
+colours are identical in both themes because they carry meaning and are
+mirrored in the `FilterPanel` key; only contrast-dependent values (labels,
+label outline/background, borders, selection, and the yellow/cyan edge
+colours that vanish on white) differ. `FilterPanel` must keep using the same
+`getNodeTypeAppearance` / `getEdgeTypeColor` accessors as the canvas.
+
+`graphene.theme` in `localStorage` is the only value Graphene persists. It is
+a UI preference and must never be extended to hold tenant, directory,
+account, or investigation data.
+
+jsdom does not implement `window.matchMedia`; `src/tests/setup.ts` installs a
+light-reporting stub so component tests can render `ThemeProvider`.

@@ -1,7 +1,8 @@
 import type { GraphEdgeType, GraphNodeType, InvestigationGraph } from '../../graph/model/types.ts';
 import { edgeTypeLabels, nodeTypeLabels } from '../../graph/model/labels.ts';
 import { getNodeTypeIcon } from '../../graph/cytoscape/icons.ts';
-import { getEdgeTypeColor, nodeTypeAppearance } from '../../graph/cytoscape/stylesheet.ts';
+import { getEdgeTypeColor, getNodeTypeAppearance } from '../../graph/cytoscape/stylesheet.ts';
+import { useTheme } from '../../theme/useTheme.ts';
 import {
   applyGraphFilters,
   distinctEdgeTypes,
@@ -26,6 +27,7 @@ interface FilterPanelProps {
  * key at the bottom explains edge colour and direct/inherited line style.
  */
 export function FilterPanel({ graph, filters, onChange }: FilterPanelProps) {
+  const { resolvedTheme } = useTheme();
   const nodeTypes = distinctNodeTypes(graph);
   const edgeTypes = distinctEdgeTypes(graph);
   const visible = applyGraphFilters(graph, filters);
@@ -73,25 +75,29 @@ export function FilterPanel({ graph, filters, onChange }: FilterPanelProps) {
 
       <fieldset>
         <legend>Object types</legend>
-        {nodeTypes.map((type) => (
-          <label key={type} className="filter-checkbox">
-            <input
-              type="checkbox"
-              checked={!filters.hiddenNodeTypes.has(type)}
-              onChange={() => toggleNodeType(type)}
-            />
-            <span
-              className="filter-icon-badge"
-              style={{
-                backgroundColor: nodeTypeAppearance[type].color,
-                borderColor: nodeTypeAppearance[type].borderColor,
-                backgroundImage: `url("${getNodeTypeIcon(type)}")`,
-              }}
-              aria-hidden="true"
-            />
-            {nodeTypeLabels[type]}s
-          </label>
-        ))}
+        {nodeTypes.map((type) => {
+          const appearance = getNodeTypeAppearance(type, resolvedTheme);
+
+          return (
+            <label key={type} className="filter-checkbox">
+              <input
+                type="checkbox"
+                checked={!filters.hiddenNodeTypes.has(type)}
+                onChange={() => toggleNodeType(type)}
+              />
+              <span
+                className="filter-icon-badge"
+                style={{
+                  backgroundColor: appearance.color,
+                  borderColor: appearance.borderColor,
+                  backgroundImage: `url("${getNodeTypeIcon(type)}")`,
+                }}
+                aria-hidden="true"
+              />
+              {nodeTypeLabels[type]}s
+            </label>
+          );
+        })}
       </fieldset>
 
       <fieldset>
@@ -105,7 +111,7 @@ export function FilterPanel({ graph, filters, onChange }: FilterPanelProps) {
             />
             <i
               className="filter-edge-swatch"
-              style={{ borderTopColor: getEdgeTypeColor(type) }}
+              style={{ borderTopColor: getEdgeTypeColor(type, resolvedTheme) }}
               aria-hidden="true"
             />
             {edgeTypeLabels[type]}

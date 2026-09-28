@@ -2,9 +2,11 @@
 
 ## Goal
 
-Present the investigation control surfaces in a collapsible left sidebar on
-landscape displays, without changing Graphene's authentication model,
-permission baseline, investigation semantics, or static-SPA trust boundary.
+Add a light theme to Graphene. The effective theme follows the operating
+system colour-scheme preference by default and can be overridden by the user
+to Light or Dark, with the override persisted locally. No change to the
+authentication model, permission baseline, investigation semantics, or the
+static-SPA trust boundary.
 
 ## Contract status
 
@@ -12,83 +14,119 @@ completed
 
 ## Approved scope
 
-- Restructure `GraphExplorer` so the query, toolbar, filter, and analysis
-  controls live inside a labelled, collapsible controls region.
-- Responsive CSS that places the controls region to the left of the graph
-  stage on landscape displays and collapses it to a narrow rail.
-- Focused `GraphExplorer` tests for disclosure behaviour.
+- A `src/theme/` module: preference types, pure storage/resolution helpers,
+  a React context/provider, a `useTheme` hook, and an appearance toggle.
+- Replacing hard-coded colours in `src/styles.css` with semantic CSS custom
+  properties resolved through `light-dark()` and `color-scheme`.
+- Making the Cytoscape stylesheet and its exported colour accessors a
+  function of the resolved theme, and re-applying canvas styles on change.
+- Passing the resolved theme into `FilterPanel` so the key matches the canvas.
+- Media-scoped `theme-color` meta tags in `index.html`.
+- A `matchMedia` stub in `src/tests/setup.ts`, since jsdom lacks it.
+- Tests for the new helpers, provider, toggle, and themed stylesheet, plus
+  updating `icons.test.ts` for the new stylesheet signature.
 - A task-specific implementation plan under `.github/carl/plans/`.
-- Amendment: stabilise the hoisted `useAuth` mock in
-  `GraphExplorer.test.tsx`. The existing mock returned a fresh object per
-  render, which made `QueryPanel`'s typeahead effect loop until the Node
-  heap was exhausted, so the file could not be validated at all.
 
 ## Non-goals
 
-- Changing any control's behaviour, wording, or accessible name.
-- Persisting sidebar state, adding animations, or adding a UI framework.
-- Changing graph ingestion, analysis, filtering, or export behaviour.
-- A backend, persistent tenant data, telemetry, or new dependencies.
+- Changing any control behaviour, wording, or accessible name.
+- Theming beyond colour; no spacing, type, motion, or density changes.
+- A design-token build step, CSS preprocessor, or UI framework.
+- Persisting anything other than the user's own theme choice.
 
 ## Forbidden scope
 
+- New runtime or development dependencies.
 - Delegated permissions beyond `User.Read` and `Directory.Read.All`.
 - Application permissions, client secrets, certificates, or token exposure.
 - Entra authorities other than `organizations`.
 - Graph response logging or raw tenant data persistence.
+- Persisting any tenant, directory, account, or investigation data.
+- Relaxing the `netlify.toml` Content-Security-Policy, including adding
+  `unsafe-inline` to `script-src` for a pre-paint theme script.
 - `dangerouslySetInnerHTML`.
 
 ## Architectural constraints
 
-- Remain a Vite + React + TypeScript static SPA.
-- Presentation-only change; no Microsoft Graph or ingestion code is touched.
-- Use native CSS media queries and grid; no layout dependency.
-- Use native disclosure semantics so collapsed controls leave the
-  accessibility tree rather than being visually hidden only.
+- Remain a Vite + React + TypeScript static SPA with no backend.
+- Resolve the system default in CSS so it is correct before JavaScript runs
+  and without an inline script, preserving `script-src 'self'`.
+- Mirror the existing `AuthContext` / `AuthProvider` / `useAuth` module shape.
+- `useTheme` must not throw outside a provider; theme is presentation, not a
+  safety property.
+- Access `localStorage` defensively; unavailable or malformed storage must
+  degrade to the system preference, never throw.
+- Node tile colours keep their meaning across themes; only contrast-dependent
+  values change.
 
 ## Files expected to change
 
 - `.github/carl/current-pr-contract.md`
-- `.github/carl/plans/landscape-controls-sidebar.md`
+- `.github/carl/plans/light-theme.md`
 - `.github/carl/memory.md`
 - `README.md`
-- `src/features/graphExplorer/GraphExplorer.tsx`
-- `src/features/graphExplorer/GraphExplorer.test.tsx`
+- `index.html`
+- `src/main.tsx`
+- `src/App.tsx`
 - `src/styles.css`
+- `src/tests/setup.ts`
+- `src/theme/theme.ts`
+- `src/theme/theme.test.ts`
+- `src/theme/ThemeContext.ts`
+- `src/theme/ThemeProvider.tsx`
+- `src/theme/ThemeProvider.test.tsx`
+- `src/theme/useTheme.ts`
+- `src/theme/ThemeToggle.tsx`
+- `src/graph/cytoscape/stylesheet.ts`
+- `src/graph/cytoscape/GraphCanvas.tsx`
+- `src/graph/cytoscape/icons.test.ts`
+- `src/features/graphExplorer/FilterPanel.tsx`
 
 ## Contract assertions
 
-1. The control surfaces are wrapped in a single region with the accessible
-   name "Investigation controls".
-2. A toggle button exposes `aria-expanded` and `aria-controls` for that
-   region, and the region starts expanded.
-3. Collapsing the region removes the query, toolbar, filter, and analysis
-   controls from the accessibility tree; expanding restores them.
-4. On landscape viewports at or above 60rem wide, the controls region renders
-   as a left column beside the graph stage; narrower or portrait viewports
-   keep the stacked layout.
-5. `GraphExplorer.test.tsx` completes instead of exhausting the Node heap.
-6. No dependency, permission, auth, Graph-request, ingestion, or persistence
-   changes are introduced.
+1. With no stored preference, the resolved theme follows
+   `prefers-color-scheme`, and it does so in CSS without any script.
+2. An "Appearance" control offers exactly System, Light, and Dark; System is
+   selected by default and the selected option is exposed accessibly.
+3. Choosing Light or Dark sets `data-theme` on the document element to that
+   value, overriding the system preference; choosing System removes the
+   override and follows the media query again, including live changes.
+4. The chosen preference is persisted under a single non-sensitive key and
+   restored on reload; unavailable or malformed storage falls back to System
+   without throwing.
+5. The Cytoscape stylesheet is derived from the resolved theme: label,
+   outline, border, selection, and low-contrast edge colours differ between
+   themes while node type tile colours stay identical, and `FilterPanel`'s
+   key uses the same accessors as the canvas.
+6. No dependency, permission, auth, Graph-request, ingestion, CSP, or tenant
+   data persistence change is introduced.
 
 ## Validation
 
-- `npm test -- src/features/graphExplorer/GraphExplorer.test.tsx`
+- `npm test`
 - `npm run lint`
+- `npm run format`
 - `npm run build`
 
 ## Stop conditions
 
-Stop if the layout change would require a new dependency, a change to Graph
-requests or permissions, or removal of an existing control.
+Stop if a light theme would require a new dependency, a CSP relaxation, a
+change to Microsoft Graph requests or permissions, or persistence of any data
+beyond the theme preference itself.
 
 ## Escalation triggers
 
-Ask before persisting UI state, changing control wording or behaviour, or
-altering the SPA trust boundary.
+Ask before changing existing control wording or behaviour, persisting
+anything beyond the theme preference, or altering the SPA trust boundary.
 
 ## Context reset notes
 
+Supersedes the completed landscape-controls-sidebar contract, which is
+historical evidence and does not constrain this work.
+
 All contract assertions were validated by `npm test`, `npm run lint`, and
-`npm run build`. Previous completed contract (object-search typeahead) is historical evidence
-and does not constrain this work.
+`npm run build`, plus a production `vite preview` smoke check confirming that
+`light-dark()`, the `data-theme` overrides, and the media-scoped
+`theme-color` meta tags survive the build. `npm run format` reports 37
+pre-existing unformatted Markdown files, unchanged from `HEAD`; every file
+touched by this work passes Prettier.

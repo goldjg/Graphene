@@ -74,6 +74,18 @@ stage, and the Hide controls / Show controls toggle collapses it to a narrow
 rail so the canvas gains the space. Portrait and narrower viewports keep the
 stacked layout with the same toggle.
 
+Graphene ships a dark and a light theme. The effective theme follows the
+operating-system colour scheme by default, and the "Appearance" control in the
+hero overrides it to Light or Dark. The override is stored in `localStorage`
+under `graphene.theme`, which is the only value Graphene persists. The system
+default is resolved entirely in CSS (`color-scheme` plus `light-dark()`), so
+the correct theme is painted before any JavaScript runs without needing an
+inline script that would require relaxing the `script-src 'self'`
+Content-Security-Policy. Because the Cytoscape canvas is styled in JavaScript
+rather than CSS, its stylesheet is rebuilt from the resolved theme; node type
+tile colours stay identical across themes so the key keeps its meaning, while
+labels, borders, selection, and low-contrast relationship colours adapt.
+
 The loaded graph can be searched and focused locally, summarized by object and
 relationship type, and inspected for shortest or bounded simple paths with
 plain-language relationship explanations. Graphene can export/import a

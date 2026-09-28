@@ -2,7 +2,8 @@ import cytoscape from 'cytoscape';
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 
 import { getGraphLayoutOptions, type GraphLayoutId } from './layouts.ts';
-import { cytoscapeStylesheet } from './stylesheet.ts';
+import { createCytoscapeStylesheet } from './stylesheet.ts';
+import { useTheme } from '../../theme/useTheme.ts';
 
 type Core = cytoscape.Core;
 type ElementDefinition = cytoscape.ElementDefinition;
@@ -44,6 +45,8 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(funct
   const cyRef = useRef<Core | null>(null);
   const onSelectionChangeRef = useRef(onSelectionChange);
   const initialLayoutRef = useRef(layout);
+  const { resolvedTheme } = useTheme();
+  const initialThemeRef = useRef(resolvedTheme);
 
   useEffect(() => {
     onSelectionChangeRef.current = onSelectionChange;
@@ -56,7 +59,7 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(funct
 
     const cy = cytoscape({
       container: containerRef.current,
-      style: cytoscapeStylesheet,
+      style: createCytoscapeStylesheet(initialThemeRef.current),
       elements: [],
     });
     cyRef.current = cy;
@@ -86,6 +89,17 @@ export const GraphCanvas = forwardRef<GraphCanvasHandle, GraphCanvasProps>(funct
       cyRef.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    const cy = cyRef.current;
+
+    if (!cy || initialThemeRef.current === resolvedTheme) {
+      return;
+    }
+
+    initialThemeRef.current = resolvedTheme;
+    cy.style(createCytoscapeStylesheet(resolvedTheme));
+  }, [resolvedTheme]);
 
   useEffect(() => {
     const cy = cyRef.current;
