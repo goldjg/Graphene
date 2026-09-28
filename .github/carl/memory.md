@@ -31,9 +31,14 @@ name in product UI, documentation headings, package names, or project metadata.
 
 Branding artwork lives in `public/` and is served from the site root:
 
-- `graphene-logo.png` is the wordmark. It is rendered inside the hero `<h1>`
-  with `alt="Graphene"`, which preserves the accessible name referenced by
-  `aria-labelledby="graphene-title"`, and is reused at the top of `README.md`.
+- `graphene-logo.png` is the original white-lettered wordmark for dark
+  backgrounds. `graphene-logo-light.png` is its light-background counterpart:
+  only the pale wordmark pixels are remapped to Graphene navy; the icon, blue
+  lettering, alpha channel, and 900x325 dimensions stay unchanged.
+  `ThemeLogo` selects between them from `resolvedTheme` inside the hero `<h1>`
+  while keeping `alt="Graphene"`, which preserves the accessible name
+  referenced by `aria-labelledby="graphene-title"`. The original wordmark is
+  reused at the top of `README.md`.
 - `graphene-icon.png` is the 512px node-graph glyph master. `favicon.ico`,
   `favicon-16x16.png`, `favicon-32x32.png`, `favicon-192x192.png`, and
   `apple-touch-icon.png` are all derived from it.
@@ -255,6 +260,11 @@ colours that vanish on white) differ. `FilterPanel` must keep using the same
 `graphene.theme` in `localStorage` is the only value Graphene persists. It is
 a UI preference and must never be extended to hold tenant, directory,
 account, or investigation data.
+
+The hero wordmark is also theme-dependent. `ThemeLogo` uses
+`graphene-logo-light.png` for the light theme and the original
+`graphene-logo.png` for dark. Keep the two assets' dimensions, transparency,
+icon colours, intrinsic HTML dimensions, and accessible name aligned.
 
 jsdom does not implement `window.matchMedia`; `src/tests/setup.ts` installs a
 light-reporting stub so component tests can render `ThemeProvider`.

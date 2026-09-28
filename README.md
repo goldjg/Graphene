@@ -85,6 +85,8 @@ Content-Security-Policy. Because the Cytoscape canvas is styled in JavaScript
 rather than CSS, its stylesheet is rebuilt from the resolved theme; node type
 tile colours stay identical across themes so the key keeps its meaning, while
 labels, borders, selection, and low-contrast relationship colours adapt.
+The hero likewise uses a dark-lettered wordmark in light mode and preserves
+the original white-lettered artwork in dark mode.
 
 The loaded graph can be searched and focused locally, summarized by object and
 relationship type, and inspected for shortest or bounded simple paths with

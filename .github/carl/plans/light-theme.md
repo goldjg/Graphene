@@ -89,3 +89,13 @@ and a missing provider must not break rendering.
   Firefox 120). Consistent with the existing use of CSS media range syntax
   and `rgb(... / %)`, but it does raise the floor.
 - Theme values are hand-checked for contrast, not automatically verified.
+
+## Light-wordmark contrast follow-up
+
+A deployed mobile screenshot showed that the original wordmark's white
+"Graph" lettering disappears against the light hero background. Add
+`public/graphene-logo-light.png`, derived from the transparent dark-theme
+asset by remapping only its pale wordmark pixels to Graphene navy. Preserve
+the icon, blue lettering, alpha channel, dimensions, and dark-theme asset.
+`App` selects the asset from `resolvedTheme`; the `<h1>`, image alt text, and
+intrinsic dimensions remain unchanged.

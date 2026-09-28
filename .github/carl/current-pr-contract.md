@@ -26,6 +26,9 @@ completed
 - Tests for the new helpers, provider, toggle, and themed stylesheet, plus
   updating `icons.test.ts` for the new stylesheet signature.
 - A task-specific implementation plan under `.github/carl/plans/`.
+- Follow-up: derive a light-background wordmark from the existing transparent
+  source, changing only pale wordmark pixels to Graphene navy while preserving
+  the icon and blue lettering, and select the asset from the resolved theme.
 
 ## Non-goals
 
@@ -65,6 +68,7 @@ completed
 - `.github/carl/plans/light-theme.md`
 - `.github/carl/memory.md`
 - `README.md`
+- `public/graphene-logo-light.png`
 - `index.html`
 - `src/main.tsx`
 - `src/App.tsx`
@@ -75,6 +79,7 @@ completed
 - `src/theme/ThemeContext.ts`
 - `src/theme/ThemeProvider.tsx`
 - `src/theme/ThemeProvider.test.tsx`
+- `src/theme/ThemeLogo.tsx`
 - `src/theme/useTheme.ts`
 - `src/theme/ThemeToggle.tsx`
 - `src/graph/cytoscape/stylesheet.ts`
@@ -100,6 +105,8 @@ completed
    key uses the same accessors as the canvas.
 6. No dependency, permission, auth, Graph-request, ingestion, CSP, or tenant
    data persistence change is introduced.
+7. The light theme uses a high-contrast wordmark without changing the dark
+   theme asset, accessible name, intrinsic dimensions, or icon colours.
 
 ## Validation
 
@@ -130,3 +137,8 @@ All contract assertions were validated by `npm test`, `npm run lint`, and
 `theme-color` meta tags survive the build. `npm run format` reports 37
 pre-existing unformatted Markdown files, unchanged from `HEAD`; every file
 touched by this work passes Prettier.
+
+The light-wordmark follow-up was validated by the full 110-test suite, lint,
+Prettier on all touched text files, and a production build. Pixel-level checks
+confirmed that the derived asset remains 900x325, retains the original alpha
+channel, and leaves the icon region unchanged.

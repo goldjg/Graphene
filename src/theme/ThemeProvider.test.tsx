@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { ThemeProvider } from './ThemeProvider.tsx';
+import { ThemeLogo } from './ThemeLogo.tsx';
 import { ThemeToggle } from './ThemeToggle.tsx';
 import { useTheme } from './useTheme.ts';
 import { PREFERS_DARK_QUERY, THEME_STORAGE_KEY, type ThemeStorage } from './theme.ts';
@@ -153,6 +154,34 @@ describe('ThemeProvider and ThemeToggle', () => {
     expect(screen.getByRole('radio', { name: 'Dark' })).toBeChecked();
     expect(screen.getByTestId('probe')).toHaveTextContent('dark:dark');
     expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
+  });
+
+  it('uses the dark-lettered wordmark in the light theme', () => {
+    installMatchMedia(false);
+    render(
+      <ThemeProvider storage={memoryStorage().storage}>
+        <ThemeLogo />
+      </ThemeProvider>,
+    );
+
+    expect(screen.getByRole('img', { name: 'Graphene' })).toHaveAttribute(
+      'src',
+      '/graphene-logo-light.png',
+    );
+  });
+
+  it('preserves the original wordmark in the dark theme', () => {
+    installMatchMedia(true);
+    render(
+      <ThemeProvider storage={memoryStorage().storage}>
+        <ThemeLogo />
+      </ThemeProvider>,
+    );
+
+    expect(screen.getByRole('img', { name: 'Graphene' })).toHaveAttribute(
+      'src',
+      '/graphene-logo.png',
+    );
   });
 
   it('falls back to System when storage is unavailable', () => {

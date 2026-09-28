@@ -2,6 +2,7 @@ import { AuthProvider } from './auth/AuthProvider.tsx';
 import { useAuth } from './auth/useAuth.ts';
 import { getAppConfig } from './config/environment.ts';
 import { GraphExplorer } from './features/graphExplorer/GraphExplorer.tsx';
+import { ThemeLogo } from './theme/ThemeLogo.tsx';
 import { ThemeToggle } from './theme/ThemeToggle.tsx';
 
 export function App() {
@@ -12,13 +13,7 @@ export function App() {
       <section className="hero" aria-labelledby="graphene-title">
         <p className="eyebrow">Microsoft Entra access investigation</p>
         <h1 id="graphene-title">
-          <img
-            className="hero-logo"
-            src="/graphene-logo.png"
-            alt="Graphene"
-            width={900}
-            height={325}
-          />
+          <ThemeLogo />
         </h1>
         <p className="lede">
           A provenance-aware static SPA for exploring how identities relate to Microsoft Entra
