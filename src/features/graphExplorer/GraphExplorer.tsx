@@ -35,6 +35,7 @@ export function GraphExplorer() {
   const [filters, setFilters] = useState(defaultFilterState());
   const [expansionMessage, setExpansionMessage] = useState<string | null>(null);
   const [isExpanding, setIsExpanding] = useState(false);
+  const [areControlsOpen, setAreControlsOpen] = useState(true);
   const graphGenerationRef = useRef(0);
   const expansionAbortRef = useRef<AbortController | null>(null);
 
@@ -133,44 +134,66 @@ export function GraphExplorer() {
         Demo data is clearly labelled sample data. Loading it never calls Microsoft Graph.
       </p>
 
-      <QueryPanel onResult={handleQueryResult} onReset={handleQueryReset} />
+      <div
+        className={`graph-explorer-layout${areControlsOpen ? '' : ' graph-explorer-layout-collapsed'}`}
+      >
+        <aside className="graph-controls" aria-label="Investigation controls">
+          <button
+            type="button"
+            className="graph-controls-toggle"
+            aria-expanded={areControlsOpen}
+            aria-controls="graph-controls-content"
+            onClick={() => setAreControlsOpen((open) => !open)}
+          >
+            {areControlsOpen ? 'Hide controls' : 'Show controls'}
+          </button>
 
-      <GraphToolbar
-        graph={filteredGraph}
-        exportGraph={graph}
-        layout={layout}
-        onLayoutChange={setLayout}
-        onLoadDemo={handleLoadDemo}
-        canvasHandle={canvasHandle}
-      />
+          <div
+            id="graph-controls-content"
+            className="graph-controls-content"
+            hidden={!areControlsOpen}
+          >
+            <QueryPanel onResult={handleQueryResult} onReset={handleQueryReset} />
 
-      {graph && <FilterPanel graph={graph} filters={filters} onChange={setFilters} />}
-      {graph && filteredGraph ? (
-        <AnalysisPanel
-          graph={graph}
-          visibleGraph={filteredGraph}
-          canvasHandle={canvasHandle}
-          onImportGraph={handleQueryResult}
-        />
-      ) : null}
+            <GraphToolbar
+              graph={filteredGraph}
+              exportGraph={graph}
+              layout={layout}
+              onLayoutChange={setLayout}
+              onLoadDemo={handleLoadDemo}
+              canvasHandle={canvasHandle}
+            />
 
-      <div className="graph-explorer-body">
-        <div className="graph-stage">
-          <GraphCanvas
-            ref={setCanvasRef}
-            elements={elements}
-            layout={layout}
-            onSelectionChange={setSelection}
+            {graph && <FilterPanel graph={graph} filters={filters} onChange={setFilters} />}
+            {graph && filteredGraph ? (
+              <AnalysisPanel
+                graph={graph}
+                visibleGraph={filteredGraph}
+                canvasHandle={canvasHandle}
+                onImportGraph={handleQueryResult}
+              />
+            ) : null}
+          </div>
+        </aside>
+
+        <div className="graph-explorer-body">
+          <div className="graph-stage">
+            <GraphCanvas
+              ref={setCanvasRef}
+              elements={elements}
+              layout={layout}
+              onSelectionChange={setSelection}
+            />
+          </div>
+          <DetailsPanel
+            graph={filteredGraph ?? { nodes: [], edges: [] }}
+            selection={selection}
+            canExpand={Boolean(expansionTarget) && authStatus === 'authenticated'}
+            isExpanding={isExpanding}
+            expansionMessage={expansionMessage}
+            onExpand={() => void handleExpandSelected()}
           />
         </div>
-        <DetailsPanel
-          graph={filteredGraph ?? { nodes: [], edges: [] }}
-          selection={selection}
-          canExpand={Boolean(expansionTarget) && authStatus === 'authenticated'}
-          isExpanding={isExpanding}
-          expansionMessage={expansionMessage}
-          onExpand={() => void handleExpandSelected()}
-        />
       </div>
     </section>
   );

@@ -29,19 +29,23 @@ vi.mock('cytoscape', () => {
 /**
  * GraphExplorer renders QueryPanel, which requires an AuthProvider context.
  * These tests exercise demo-data flows only, so useAuth is mocked directly
- * to avoid standing up MSAL.
+ * to avoid standing up MSAL. The mocked context value is hoisted and stable
+ * because QueryPanel effects depend on `getGraphClient` identity; returning a
+ * fresh object per render would re-run those effects forever.
  */
+const mockAuth = vi.hoisted(() => ({
+  status: 'unauthenticated' as const,
+  account: null,
+  currentUser: null,
+  error: null,
+  signIn: vi.fn(),
+  signOut: vi.fn(),
+  refreshIdentity: vi.fn(),
+  getGraphClient: () => null,
+}));
+
 vi.mock('../../auth/useAuth.ts', () => ({
-  useAuth: () => ({
-    status: 'unauthenticated',
-    account: null,
-    currentUser: null,
-    error: null,
-    signIn: vi.fn(),
-    signOut: vi.fn(),
-    refreshIdentity: vi.fn(),
-    getGraphClient: () => null,
-  }),
+  useAuth: () => mockAuth,
 }));
 
 describe('GraphExplorer', () => {
@@ -79,5 +83,27 @@ describe('GraphExplorer', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Reset filters' }));
 
     expect(screen.getByText(/nodes, .* edges/).textContent).toEqual(beforeStats);
+  });
+
+  it('collapses and restores the investigation controls sidebar', () => {
+    render(<GraphExplorer />);
+
+    const toggle = screen.getByRole('button', { name: 'Hide controls' });
+    expect(
+      screen.getByRole('complementary', { name: 'Investigation controls' }),
+    ).toBeInTheDocument();
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    expect(toggle).toHaveAttribute('aria-controls', 'graph-controls-content');
+    expect(screen.getByRole('button', { name: 'Load demo data' })).toBeInTheDocument();
+
+    fireEvent.click(toggle);
+
+    const collapsedToggle = screen.getByRole('button', { name: 'Show controls' });
+    expect(collapsedToggle).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.queryByRole('button', { name: 'Load demo data' })).not.toBeInTheDocument();
+
+    fireEvent.click(collapsedToggle);
+
+    expect(screen.getByRole('button', { name: 'Load demo data' })).toBeInTheDocument();
   });
 });

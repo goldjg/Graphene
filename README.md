@@ -67,6 +67,13 @@ encoded by colour alone. The Filters panel doubles as the graph's key/legend: ea
 object-type filter shows the same icon badge rendered on the canvas, and a
 relationship key explains edge colour and direct/inherited line style.
 
+The investigation controls (query, toolbar, filters, and analysis) live in a
+single collapsible "Investigation controls" region. On landscape displays at
+least 60rem wide it renders as a sticky sidebar to the left of the graph
+stage, and the Hide controls / Show controls toggle collapses it to a narrow
+rail so the canvas gains the space. Portrait and narrower viewports keep the
+stacked layout with the same toggle.
+
 The loaded graph can be searched and focused locally, summarized by object and
 relationship type, and inspected for shortest or bounded simple paths with
 plain-language relationship explanations. Graphene can export/import a

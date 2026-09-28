@@ -2,9 +2,9 @@
 
 ## Goal
 
-Add responsive typeahead to the live object-search field without changing
-Graphene's authentication model, permission baseline, investigation semantics,
-or static-SPA trust boundary.
+Present the investigation control surfaces in a collapsible left sidebar on
+landscape displays, without changing Graphene's authentication model,
+permission baseline, investigation semantics, or static-SPA trust boundary.
 
 ## Contract status
 
@@ -12,22 +12,23 @@ completed
 
 ## Approved scope
 
-- Debounced Microsoft Graph typeahead for every supported investigation target.
-- One bounded, asynchronous Graph request for the currently selected object
-  type, with stale requests aborted when input or target type changes.
-- Accessible mouse and keyboard selection of suggestions.
-- Focused Graph client and query-panel tests.
-- Directly related styles and durable user documentation.
+- Restructure `GraphExplorer` so the query, toolbar, filter, and analysis
+  controls live inside a labelled, collapsible controls region.
+- Responsive CSS that places the controls region to the left of the graph
+  stage on landscape displays and collapses it to a narrow rail.
+- Focused `GraphExplorer` tests for disclosure behaviour.
 - A task-specific implementation plan under `.github/carl/plans/`.
+- Amendment: stabilise the hoisted `useAuth` mock in
+  `GraphExplorer.test.tsx`. The existing mock returned a fresh object per
+  render, which made `QueryPanel`'s typeahead effect loop until the Node
+  heap was exhausted, so the file could not be validated at all.
 
 ## Non-goals
 
-- Searching every object type simultaneously.
-- Recursive or automatic whole-tenant traversal.
-- Background workers for network I/O that is already asynchronous.
-- JSON batching when one selected object collection requires only one request.
+- Changing any control's behaviour, wording, or accessible name.
+- Persisting sidebar state, adding animations, or adding a UI framework.
+- Changing graph ingestion, analysis, filtering, or export behaviour.
 - A backend, persistent tenant data, telemetry, or new dependencies.
-- Microsoft Graph beta endpoints, write operations, or broader permissions.
 
 ## Forbidden scope
 
@@ -40,61 +41,54 @@ completed
 ## Architectural constraints
 
 - Remain a Vite + React + TypeScript static SPA.
-- Use Microsoft Graph v1.0 and the existing `GraphClient`.
-- Keep Graph DTOs separate from normalized graph-domain objects.
-- Limit typeahead results and response processing so typing remains responsive.
-- Treat Graph strings as untrusted and render through React escaping.
+- Presentation-only change; no Microsoft Graph or ingestion code is touched.
+- Use native CSS media queries and grid; no layout dependency.
+- Use native disclosure semantics so collapsed controls leave the
+  accessibility tree rather than being visually hidden only.
 
 ## Files expected to change
 
 - `.github/carl/current-pr-contract.md`
-- `.github/carl/plans/object-search-typeahead.md`
+- `.github/carl/plans/landscape-controls-sidebar.md`
 - `.github/carl/memory.md`
 - `README.md`
-- `ROADMAP.md`
-- `src/features/investigation/QueryPanel.tsx`
-- `src/features/investigation/QueryPanel.test.tsx`
-- `src/microsoftGraph/client/GraphClient.ts`
-- `src/microsoftGraph/client/GraphClient.test.ts`
-- `src/microsoftGraph/ingestion/target.ts`
+- `src/features/graphExplorer/GraphExplorer.tsx`
+- `src/features/graphExplorer/GraphExplorer.test.tsx`
 - `src/styles.css`
 
 ## Contract assertions
 
-1. Typeahead waits for a short debounce interval and never queries fewer than
-   two non-whitespace characters.
-2. Changing the query, target type, mode, or component lifecycle aborts stale
-   requests so stale results cannot replace current suggestions.
-3. Each typeahead lookup issues one bounded Microsoft Graph v1.0 collection
-   request for the selected target type and returns at most eight suggestions.
-4. Suggestions identify the object with useful secondary text and selecting
-   one writes its exact object ID into the existing investigation query.
-5. The listbox supports pointer selection plus Arrow Up, Arrow Down, Enter,
-   and Escape without making the input inaccessible.
-6. No dependency, permission, auth, backend, graph-ingestion, or persistence
+1. The control surfaces are wrapped in a single region with the accessible
+   name "Investigation controls".
+2. A toggle button exposes `aria-expanded` and `aria-controls` for that
+   region, and the region starts expanded.
+3. Collapsing the region removes the query, toolbar, filter, and analysis
+   controls from the accessibility tree; expanding restores them.
+4. On landscape viewports at or above 60rem wide, the controls region renders
+   as a left column beside the graph stage; narrower or portrait viewports
+   keep the stacked layout.
+5. `GraphExplorer.test.tsx` completes instead of exhausting the Node heap.
+6. No dependency, permission, auth, Graph-request, ingestion, or persistence
    changes are introduced.
 
 ## Validation
 
-- `npm test -- src/microsoftGraph/client/GraphClient.test.ts src/features/investigation/QueryPanel.test.tsx`
+- `npm test -- src/features/graphExplorer/GraphExplorer.test.tsx`
 - `npm run lint`
 - `npm run build`
-- `npm audit`
-- `carl map`
-- `carl status`
 
 ## Stop conditions
 
-Stop if typeahead requires a backend, a Graph beta endpoint, tenant writes,
-secret material, broader delegated scopes, or application permissions.
+Stop if the layout change would require a new dependency, a change to Graph
+requests or permissions, or removal of an existing control.
 
 ## Escalation triggers
 
-Ask before introducing a dependency, querying multiple object types for every
-keystroke, adding telemetry or persistence, or changing the SPA trust boundary.
+Ask before persisting UI state, changing control wording or behaviour, or
+altering the SPA trust boundary.
 
 ## Context reset notes
 
-The typeahead implementation and validation have been reconciled into durable
-project documentation. This completed contract is historical evidence and does
-not constrain unrelated future work.
+All contract assertions were validated by `npm test`, `npm run lint`, and
+`npm run build`. Previous completed contract (object-search typeahead) is historical evidence
+and does not constrain this work.

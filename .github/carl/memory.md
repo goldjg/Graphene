@@ -201,3 +201,19 @@ object-type filter checkbox shows the same icon badge rendered on the canvas,
 and a relationship key below the checkboxes explains edge colour
 (`getEdgeTypeColor` in `stylesheet.ts`) and direct/inherited line style. Do
 not reintroduce a separate floating canvas legend component.
+
+## Explorer layout
+
+`GraphExplorer` renders the investigation control surfaces (query panel,
+toolbar, filters, analysis) inside one collapsible `aside` labelled
+"Investigation controls", with the graph stage and details panel beside it.
+The toggle uses `aria-expanded`/`aria-controls` and the `hidden` attribute so
+collapsed controls leave the accessibility tree rather than being only
+visually hidden. On landscape viewports at or above 60rem the controls become
+a sticky left column that collapses to a narrow rail; portrait and narrow
+viewports keep the stacked layout.
+
+Component tests that mock `useAuth` must return a stable, hoisted context
+value. `QueryPanel`'s typeahead effect depends on `getGraphClient` identity,
+so a mock returning a fresh object per render causes an infinite effect/render
+loop that exhausts the Node heap instead of failing a test.
